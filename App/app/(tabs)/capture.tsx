@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Link } from 'expo-router';
@@ -7,20 +7,33 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { createSavedPage } from '@/storage';
 
 export default function CaptureScreen() {
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
   const [url, setUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
-  const onSubmit = () => {
+  const onSubmit = useCallback(async () => {
     if (!url.trim()) {
       Alert.alert('Enter a link', 'Paste the address of the page you want to keep offline.');
       return;
     }
 
-    Alert.alert('Not yet implemented', 'We will add the save flow in the next steps.');
-  };
+    setIsSaving(true);
+    try {
+      const normalizedUrl = url.trim();
+      await createSavedPage({ url: normalizedUrl });
+      setUrl('');
+      Alert.alert('Saved to library', 'We will download the page contents shortly.');
+    } catch (error) {
+      console.error('Failed to queue page for saving', error);
+      Alert.alert('Could not save', error instanceof Error ? error.message : 'Please try again later.');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [url]);
 
   return (
     <KeyboardAvoidingView
@@ -46,6 +59,7 @@ export default function CaptureScreen() {
             returnKeyType="done"
             onSubmitEditing={onSubmit}
             placeholderTextColor={theme.muted + '99'}
+            editable={!isSaving}
             style={[
               styles.input,
               {
@@ -65,10 +79,13 @@ export default function CaptureScreen() {
               borderColor: theme.border,
             },
           ]}>
-          <ThemedText type="defaultSemiBold">Coming soon</ThemedText>
+          <ThemedText type="defaultSemiBold">Queue download</ThemedText>
           <ThemedText type="default">
-            We will fetch the page, download assets, and save everything locally so you can read it
-            anywhere.
+            PagePocket saves the link now and fetches the article in the background so it stays
+            available offline.
+          </ThemedText>
+          <ThemedText type="default" style={{ color: theme.muted }}>
+            {isSaving ? 'Adding to library…' : 'Tap return on your keyboard to save the link.'}
           </ThemedText>
         </ThemedView>
 
