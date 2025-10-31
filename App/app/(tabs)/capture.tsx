@@ -8,6 +8,7 @@ import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { createSavedPage } from '@/storage';
+import { queueSavedPageCapture } from '@/capture/page-capture-service';
 
 export default function CaptureScreen() {
   const colorScheme = useColorScheme();
@@ -24,7 +25,8 @@ export default function CaptureScreen() {
     setIsSaving(true);
     try {
       const normalizedUrl = url.trim();
-      await createSavedPage({ url: normalizedUrl });
+      const savedPage = await createSavedPage({ url: normalizedUrl });
+      queueSavedPageCapture(savedPage.id);
       setUrl('');
       Alert.alert('Saved to library', 'We will download the page contents shortly.');
     } catch (error) {
