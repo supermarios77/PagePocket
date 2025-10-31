@@ -91,7 +91,7 @@ async function downloadPage(pageId: number) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     await transitionSavedPage(pageId, 'error', message);
-    throw error;
+    console.warn(`Failed to capture page ${pageId}: ${message}`);
   }
 }
 
