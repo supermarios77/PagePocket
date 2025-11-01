@@ -15,6 +15,7 @@ import {
   subscribeToSavedPages,
 } from '@/storage';
 import { queueSavedPageCapture } from '@/capture/page-capture-service';
+import { useConnectivity } from '@/connectivity/network';
 
 function useStatusLabel(page: SavedPage, tintColor: string) {
   return useMemo(() => {
@@ -131,6 +132,7 @@ export default function LibraryScreen() {
   const router = useRouter();
   const colorScheme = useColorScheme();
   const theme = Colors[colorScheme ?? 'light'];
+  const isOnline = useConnectivity();
   const [pages, setPages] = useState<SavedPage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -161,6 +163,18 @@ export default function LibraryScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
+        {!isOnline && (
+          <ThemedView
+            style={[styles.offlineBanner, { borderColor: theme.border }]}
+            lightColor={theme.surface}
+            darkColor={theme.surface}>
+            <ThemedText type="defaultSemiBold">You are offline</ThemedText>
+            <ThemedText type="default" style={{ color: theme.muted }}>
+              Captures will resume automatically once you reconnect.
+            </ThemedText>
+          </ThemedView>
+        )}
+
         <View style={styles.header}>
           <ThemedText type="title">Library</ThemedText>
           <ThemedText type="default">
@@ -245,6 +259,12 @@ const styles = StyleSheet.create({
     gap: 16,
     padding: 20,
     borderRadius: 16,
+  },
+  offlineBanner: {
+    gap: 4,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
   },
   listHeader: {
     flexDirection: 'row',

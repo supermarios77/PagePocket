@@ -1,5 +1,6 @@
 import * as FileSystem from 'expo-file-system/legacy';
 
+import { getIsOnline, subscribeToConnectivity } from '@/connectivity/network';
 import {
   getSavedPageById,
   transitionSavedPage,
@@ -30,6 +31,22 @@ function extractTitle(html: string): string | null {
   return match[1].trim() || null;
 }
 
+subscribeToConnectivity((online) => {
+  if (online) {
+    void processQueue();
+  }
+});
+
+async function annotateQueued(message: string) {
+  if (queue.length === 0) {
+    return;
+  }
+
+  await Promise.all(
+    queue.map((pageId) => transitionSavedPage(pageId, 'queued', message))
+  );
+}
+
 async function processQueue() {
   if (isProcessing) {
     return;
@@ -37,6 +54,12 @@ async function processQueue() {
   isProcessing = true;
 
   while (queue.length > 0) {
+    if (!getIsOnline()) {
+      await annotateQueued('Waiting for internet connection');
+      isProcessing = false;
+      return;
+    }
+
     const nextPageId = queue.shift();
     if (typeof nextPageId !== 'number') {
       continue;
@@ -96,7 +119,9 @@ async function downloadPage(pageId: number) {
 }
 
 export function queueSavedPageCapture(pageId: number) {
-  queue.push(pageId);
+  if (!queue.includes(pageId)) {
+    queue.push(pageId);
+  }
   void processQueue();
 }
 
