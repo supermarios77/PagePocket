@@ -1,23 +1,23 @@
 import SwiftUI
 
 struct SectionHeader: View {
-    private let titleKey: LocalizedStringKey
-    private let subtitleKey: LocalizedStringKey?
+    private let title: String
+    private let subtitle: String?
 
-    init(titleKey: LocalizedStringKey, subtitleKey: LocalizedStringKey? = nil) {
-        self.titleKey = titleKey
-        self.subtitleKey = subtitleKey
+    init(title: String, subtitle: String? = nil) {
+        self.title = title
+        self.subtitle = subtitle
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(titleKey)
+            Text(title)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(.primary)
 
-            if let subtitleKey {
-                Text(subtitleKey)
+            if let subtitle {
+                Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -28,8 +28,8 @@ struct SectionHeader: View {
 
 #Preview {
     SectionHeader(
-        titleKey: "preview.section.title",
-        subtitleKey: "preview.section.subtitle"
+        title: String(localized: "preview.section.title"),
+        subtitle: String(localized: "preview.section.subtitle")
     )
     .padding()
 }

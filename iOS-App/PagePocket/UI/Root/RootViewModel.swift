@@ -9,15 +9,18 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel()
+        HomeViewModel(offlineReaderService: appEnvironment.offlineReaderService)
     }
 
     func makeBrowserViewModel() -> BrowserViewModel {
-        BrowserViewModel()
+        BrowserViewModel(
+            offlineReaderService: appEnvironment.offlineReaderService,
+            browsingExperienceService: appEnvironment.browsingExperienceService
+        )
     }
 
     func makeDownloadsViewModel() -> DownloadsViewModel {
-        DownloadsViewModel()
+        DownloadsViewModel(downloadService: appEnvironment.downloadService)
     }
 }
 

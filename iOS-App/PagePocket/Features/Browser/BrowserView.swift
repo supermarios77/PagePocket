@@ -7,7 +7,7 @@ import SwiftUI
 
 struct BrowserView: View {
     @StateObject private var viewModel: BrowserViewModel
-    @State private var query: String = ""
+    @State private var presentedFeedback: BrowserViewModel.CaptureFeedback?
 
     init(viewModel: BrowserViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -20,16 +20,16 @@ struct BrowserView: View {
 
                 VStack(alignment: .leading, spacing: 16) {
                     SectionHeader(
-                        titleKey: "browser.recentSessions.title",
-                        subtitleKey: "browser.recentSessions.subtitle"
+                        title: String(localized: "browser.recentSessions.title"),
+                        subtitle: String(localized: "browser.recentSessions.subtitle")
                     )
 
                     VStack(spacing: 16) {
-                        ForEach(BrowserViewData.recentSessions) { session in
+                        ForEach(viewModel.recentSessions) { session in
                             PlaceholderListRow(
-                                titleKey: session.titleKey,
-                                subtitleKey: session.subtitleKey,
-                                statusKey: session.statusKey,
+                                title: session.title,
+                                subtitle: session.subtitle,
+                                status: session.status,
                                 systemImageName: session.systemImageName
                             )
                             .padding(.horizontal, 20)
@@ -42,12 +42,12 @@ struct BrowserView: View {
                 }
 
                 SectionHeader(
-                    titleKey: "browser.suggestedActions.title",
-                    subtitleKey: "browser.suggestedActions.subtitle"
+                    title: String(localized: "browser.suggestedActions.title"),
+                    subtitle: String(localized: "browser.suggestedActions.subtitle")
                 )
 
-                LazyVGrid(columns: BrowserViewData.gridColumns, spacing: 16) {
-                    ForEach(BrowserViewData.suggestedActions) { action in
+                LazyVGrid(columns: gridColumns, spacing: 16) {
+                    ForEach(viewModel.suggestedActions) { action in
                         VStack(alignment: .leading, spacing: 12) {
                             Image(systemName: action.systemImageName)
                                 .font(.title2)
@@ -57,10 +57,10 @@ struct BrowserView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(action.titleKey)
+                                Text(action.title)
                                     .font(.headline)
 
-                                Text(action.subtitleKey)
+                                Text(action.subtitle)
                                     .font(.subheadline)
                                     .foregroundStyle(.secondary)
                             }
@@ -76,14 +76,14 @@ struct BrowserView: View {
 
                 VStack(alignment: .leading, spacing: 16) {
                     SectionHeader(
-                        titleKey: "browser.offlinePreview.title",
-                        subtitleKey: "browser.offlinePreview.subtitle"
+                        title: String(localized: "browser.offlinePreview.title"),
+                        subtitle: String(localized: "browser.offlinePreview.subtitle")
                     )
 
                     PlaceholderCard(
-                        titleKey: "browser.offlinePreview.card.title",
-                        descriptionKey: "browser.offlinePreview.card.subtitle",
-                        systemImageName: "arrow.down.doc"
+                        title: viewModel.offlinePreview.title,
+                        description: viewModel.offlinePreview.description,
+                        systemImageName: viewModel.offlinePreview.systemImageName
                     )
                 }
             }
@@ -91,11 +91,11 @@ struct BrowserView: View {
             .padding(.vertical, 24)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("browser.navigation.title")
+        .navigationTitle(String(localized: "browser.navigation.title"))
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
-                Button("browser.keyboard.dismiss", role: .cancel) {
-                    query = ""
+                Button(String(localized: "browser.keyboard.dismiss"), role: .cancel) {
+                    viewModel.query = ""
                 }
             }
 
@@ -103,22 +103,59 @@ struct BrowserView: View {
                 Button(action: {}) {
                     Image(systemName: "ellipsis.circle")
                 }
-                .accessibilityLabel("browser.navigation.menu")
+                .accessibilityLabel(String(localized: "browser.navigation.menu"))
+            }
+        }
+        .overlay(alignment: .top) {
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding(.top, 12)
+            }
+        }
+        .task {
+            await viewModel.loadContentIfNeeded()
+        }
+        .onChange(of: viewModel.captureFeedback) { newValue in
+            presentedFeedback = newValue
+        }
+        .alert(item: Binding(
+            get: { presentedFeedback },
+            set: { presentedFeedback = $0 }
+        )) { feedback in
+            switch feedback.kind {
+            case let .success(message):
+                return Alert(
+                    title: Text(String(localized: "browser.capture.success.title")),
+                    message: Text(message),
+                    dismissButton: .default(Text(String(localized: "common.ok"))) {
+                        presentedFeedback = nil
+                    }
+                )
+            case let .failure(message):
+                return Alert(
+                    title: Text(String(localized: "browser.capture.error.title")),
+                    message: Text(message),
+                    dismissButton: .default(Text(String(localized: "common.ok"))) {
+                        presentedFeedback = nil
+                    }
+                )
             }
         }
     }
 
     private var searchField: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("browser.search.title")
+            Text(String(localized: "browser.search.title"))
                 .font(.title3.bold())
 
             HStack(spacing: 12) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
 
-                TextField("browser.search.placeholder", text: $query)
+                TextField(String(localized: "browser.search.placeholder"), text: $viewModel.query)
                     .textFieldStyle(.plain)
+                    .textInputAutocapitalization(.none)
+                    .autocorrectionDisabled(true)
             }
             .padding(16)
             .background(
@@ -126,76 +163,32 @@ struct BrowserView: View {
                     .fill(Color(.secondarySystemBackground))
             )
 
-            Button(action: {}) {
-                Label("browser.search.action", systemImage: "safari")
+            Button(action: {
+                Task {
+                    await viewModel.captureCurrentQuery()
+                }
+            }) {
+                Label(String(localized: "browser.search.action"), systemImage: "safari")
                     .labelStyle(.titleAndIcon)
             }
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.capsule)
             .tint(Color.accentColor.opacity(0.85))
             .accessibilityIdentifier("browser-search-go-button")
+            .disabled(viewModel.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isCapturing)
         }
     }
-}
 
-private enum BrowserViewData {
-    struct RecentSession: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let statusKey: LocalizedStringKey?
-        let systemImageName: String
-    }
-
-    struct SuggestedAction: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let systemImageName: String
-    }
-
-    static let gridColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
-
-    static let recentSessions: [RecentSession] = [
-        RecentSession(
-            titleKey: "browser.recentSessions.item1.title",
-            subtitleKey: "browser.recentSessions.item1.subtitle",
-            statusKey: "browser.recentSessions.item.status.synced",
-            systemImageName: "doc.text.magnifyingglass"
-        ),
-        RecentSession(
-            titleKey: "browser.recentSessions.item2.title",
-            subtitleKey: "browser.recentSessions.item2.subtitle",
-            statusKey: "browser.recentSessions.item.status.updated",
-            systemImageName: "newspaper"
-        )
-    ]
-
-    static let suggestedActions: [SuggestedAction] = [
-        SuggestedAction(
-            titleKey: "browser.suggestedActions.item1.title",
-            subtitleKey: "browser.suggestedActions.item1.subtitle",
-            systemImageName: "bookmark.circle"
-        ),
-        SuggestedAction(
-            titleKey: "browser.suggestedActions.item2.title",
-            subtitleKey: "browser.suggestedActions.item2.subtitle",
-            systemImageName: "clock.arrow.circlepath"
-        ),
-        SuggestedAction(
-            titleKey: "browser.suggestedActions.item3.title",
-            subtitleKey: "browser.suggestedActions.item3.subtitle",
-            systemImageName: "globe.europe.africa"
-        ),
-        SuggestedAction(
-            titleKey: "browser.suggestedActions.item4.title",
-            subtitleKey: "browser.suggestedActions.item4.subtitle",
-            systemImageName: "arrow.down.doc"
-        )
-    ]
+    private let gridColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
 }
 
 #Preview {
-    BrowserView(viewModel: BrowserViewModel())
+    BrowserView(
+        viewModel: BrowserViewModel(
+            offlineReaderService: StubOfflineReaderService(),
+            browsingExperienceService: InMemoryBrowsingExperienceService()
+        )
+    )
 }
+
 

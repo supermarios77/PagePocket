@@ -2,7 +2,6 @@ import SwiftUI
 
 struct DownloadsView: View {
     @StateObject private var viewModel: DownloadsViewModel
-
     init(viewModel: DownloadsViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
     }
@@ -12,32 +11,40 @@ struct DownloadsView: View {
             List {
                 Section(
                     header: SectionHeader(
-                        titleKey: "downloads.active.title",
-                        subtitleKey: "downloads.active.subtitle"
+                        title: String(localized: "downloads.active.title"),
+                        subtitle: String(localized: "downloads.active.subtitle")
                     )
                 ) {
-                    ForEach(DownloadsViewData.activeDownloads) { item in
+                    ForEach(viewModel.activeDownloads) { item in
                         PlaceholderListRow(
-                            titleKey: item.titleKey,
-                            subtitleKey: item.subtitleKey,
-                            statusKey: item.statusKey,
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            status: item.status,
                             systemImageName: item.systemImageName
                         )
                         .accessibilityIdentifier("downloads-active-row-\(item.id.uuidString)")
+                        .swipeActions(edge: .trailing) {
+                            Button(String(localized: "downloads.actions.cancel"), role: .destructive) {
+                                Task {
+                                    await viewModel.cancelDownload(id: item.id)
+                                }
+                            }
+                            .accessibilityLabel(String(localized: "downloads.actions.cancel"))
+                        }
                     }
                 }
 
                 Section(
                     header: SectionHeader(
-                        titleKey: "downloads.completed.title",
-                        subtitleKey: "downloads.completed.subtitle"
+                        title: String(localized: "downloads.completed.title"),
+                        subtitle: String(localized: "downloads.completed.subtitle")
                     )
                 ) {
-                    ForEach(DownloadsViewData.completedDownloads) { item in
+                    ForEach(viewModel.completedDownloads) { item in
                         PlaceholderListRow(
-                            titleKey: item.titleKey,
-                            subtitleKey: item.subtitleKey,
-                            statusKey: item.statusKey,
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            status: item.status,
                             systemImageName: item.systemImageName
                         )
                         .accessibilityIdentifier("downloads-completed-row-\(item.id.uuidString)")
@@ -47,18 +54,18 @@ struct DownloadsView: View {
             .listStyle(.insetGrouped)
 
             VStack(alignment: .leading, spacing: 12) {
-                Text("downloads.actions.title")
+                Text(String(localized: "downloads.actions.title"))
                     .font(.headline)
 
                 VStack(spacing: 12) {
                     Button(action: {}) {
-                        Label("downloads.actions.import", systemImage: "folder.badge.plus")
+                        Label(String(localized: "downloads.actions.import"), systemImage: "folder.badge.plus")
                             .labelStyle(.titleAndIcon)
                     }
                     .buttonStyle(PrimaryButtonStyle())
 
                     Button(action: {}) {
-                        Label("downloads.actions.manage", systemImage: "slider.horizontal.3")
+                        Label(String(localized: "downloads.actions.manage"), systemImage: "slider.horizontal.3")
                             .labelStyle(.titleAndIcon)
                     }
                     .buttonStyle(.bordered)
@@ -76,59 +83,28 @@ struct DownloadsView: View {
             )
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("downloads.navigation.title")
+        .navigationTitle(String(localized: "downloads.navigation.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {}) {
                     Image(systemName: "ellipsis.circle")
                 }
-                .accessibilityLabel("downloads.navigation.menu")
+                .accessibilityLabel(String(localized: "downloads.navigation.menu"))
             }
+        }
+        .overlay(alignment: .top) {
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding(.top, 12)
+            }
+        }
+        .task {
+            await viewModel.loadContentIfNeeded()
         }
     }
 }
 
-private enum DownloadsViewData {
-    struct DownloadItem: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let statusKey: LocalizedStringKey
-        let systemImageName: String
-    }
-
-    static let activeDownloads: [DownloadItem] = [
-        DownloadItem(
-            titleKey: "downloads.active.item1.title",
-            subtitleKey: "downloads.active.item1.subtitle",
-            statusKey: "downloads.active.item.status.pending",
-            systemImageName: "arrow.down.circle"
-        ),
-        DownloadItem(
-            titleKey: "downloads.active.item2.title",
-            subtitleKey: "downloads.active.item2.subtitle",
-            statusKey: "downloads.active.item.status.inProgress",
-            systemImageName: "arrow.down.circle"
-        )
-    ]
-
-    static let completedDownloads: [DownloadItem] = [
-        DownloadItem(
-            titleKey: "downloads.completed.item1.title",
-            subtitleKey: "downloads.completed.item1.subtitle",
-            statusKey: "downloads.completed.item.status.available",
-            systemImageName: "checkmark.circle"
-        ),
-        DownloadItem(
-            titleKey: "downloads.completed.item2.title",
-            subtitleKey: "downloads.completed.item2.subtitle",
-            statusKey: "downloads.completed.item.status.archived",
-            systemImageName: "archivebox"
-        )
-    ]
-}
-
 #Preview {
-    DownloadsView(viewModel: DownloadsViewModel())
+    DownloadsView(viewModel: DownloadsViewModel(downloadService: InMemoryDownloadService()))
 }
 

@@ -1,17 +1,17 @@
 import SwiftUI
 
 struct PlaceholderCard: View {
-    private let titleKey: LocalizedStringKey
-    private let descriptionKey: LocalizedStringKey
+    private let title: String
+    private let description: String
     private let systemImageName: String
 
     init(
-        titleKey: LocalizedStringKey,
-        descriptionKey: LocalizedStringKey,
+        title: String,
+        description: String,
         systemImageName: String
     ) {
-        self.titleKey = titleKey
-        self.descriptionKey = descriptionKey
+        self.title = title
+        self.description = description
         self.systemImageName = systemImageName
     }
 
@@ -22,11 +22,11 @@ struct PlaceholderCard: View {
                 .foregroundStyle(.white.opacity(0.9))
                 .padding(.bottom, 4)
 
-            Text(titleKey)
+            Text(title)
                 .font(.headline)
                 .foregroundStyle(.white)
 
-            Text(descriptionKey)
+            Text(description)
                 .font(.subheadline)
                 .foregroundStyle(.white.opacity(0.85))
 
@@ -52,20 +52,20 @@ struct PlaceholderCard: View {
 }
 
 struct PlaceholderListRow: View {
-    private let titleKey: LocalizedStringKey
-    private let subtitleKey: LocalizedStringKey
-    private let statusKey: LocalizedStringKey?
+    private let title: String
+    private let subtitle: String
+    private let status: String?
     private let systemImageName: String
 
     init(
-        titleKey: LocalizedStringKey,
-        subtitleKey: LocalizedStringKey,
-        statusKey: LocalizedStringKey? = nil,
+        title: String,
+        subtitle: String,
+        status: String? = nil,
         systemImageName: String
     ) {
-        self.titleKey = titleKey
-        self.subtitleKey = subtitleKey
-        self.statusKey = statusKey
+        self.title = title
+        self.subtitle = subtitle
+        self.status = status
         self.systemImageName = systemImageName
     }
 
@@ -81,19 +81,19 @@ struct PlaceholderListRow: View {
                 .frame(width: 52, height: 52)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(titleKey)
+                Text(title)
                     .font(.headline)
                     .foregroundStyle(.primary)
 
-                Text(subtitleKey)
+                Text(subtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
 
-            if let statusKey {
-                Text(statusKey)
+            if let status {
+                Text(status)
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
@@ -112,8 +112,8 @@ struct PlaceholderListRow: View {
 
 #Preview("Card") {
     PlaceholderCard(
-        titleKey: "preview.card.title",
-        descriptionKey: "preview.card.description",
+        title: String(localized: "preview.card.title"),
+        description: String(localized: "preview.card.description"),
         systemImageName: "arrow.down.doc"
     )
     .padding()
@@ -121,9 +121,9 @@ struct PlaceholderListRow: View {
 
 #Preview("Row") {
     PlaceholderListRow(
-        titleKey: "preview.row.title",
-        subtitleKey: "preview.row.subtitle",
-        statusKey: "preview.row.status",
+        title: String(localized: "preview.row.title"),
+        subtitle: String(localized: "preview.row.subtitle"),
+        status: String(localized: "preview.row.status"),
         systemImageName: "doc.text.magnifyingglass"
     )
     .padding()

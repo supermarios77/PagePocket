@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
+    @State private var presentedError: String?
 
     init(viewModel: HomeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -13,16 +14,16 @@ struct HomeView: View {
                 heroSection
 
                 SectionHeader(
-                    titleKey: "home.quickActions.title",
-                    subtitleKey: "home.quickActions.subtitle"
+                    title: String(localized: "home.quickActions.title"),
+                    subtitle: String(localized: "home.quickActions.subtitle")
                 )
 
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
-                        ForEach(HomeViewData.quickActions) { action in
+                        ForEach(viewModel.quickActions) { action in
                             PlaceholderCard(
-                                titleKey: action.titleKey,
-                                descriptionKey: action.subtitleKey,
+                                title: action.title,
+                                description: action.subtitle,
                                 systemImageName: action.systemImageName
                             )
                         }
@@ -31,20 +32,20 @@ struct HomeView: View {
                 }
 
                 SectionHeader(
-                    titleKey: "home.readingList.title",
-                    subtitleKey: "home.readingList.subtitle"
+                    title: String(localized: "home.readingList.title"),
+                    subtitle: String(localized: "home.readingList.subtitle")
                 )
 
                 VStack(spacing: 0) {
-                    ForEach(HomeViewData.readingList) { item in
+                    ForEach(viewModel.readingList) { item in
                         PlaceholderListRow(
-                            titleKey: item.titleKey,
-                            subtitleKey: item.subtitleKey,
-                            statusKey: item.statusKey,
+                            title: item.title,
+                            subtitle: item.subtitle,
+                            status: item.status,
                             systemImageName: item.systemImageName
                         )
 
-                        if item.id != HomeViewData.readingList.last?.id {
+                        if item.id != viewModel.readingList.last?.id {
                             Divider()
                         }
                     }
@@ -57,12 +58,12 @@ struct HomeView: View {
 
                 VStack(alignment: .leading, spacing: 16) {
                     SectionHeader(
-                        titleKey: "home.offlineTips.title",
-                        subtitleKey: "home.offlineTips.subtitle"
+                        title: String(localized: "home.offlineTips.title"),
+                        subtitle: String(localized: "home.offlineTips.subtitle")
                     )
 
                     VStack(alignment: .leading, spacing: 12) {
-                        ForEach(HomeViewData.offlineTips) { tip in
+                        ForEach(viewModel.offlineTips) { tip in
                             HStack(alignment: .top, spacing: 12) {
                                 Image(systemName: tip.systemImageName)
                                     .font(.headline)
@@ -72,11 +73,11 @@ struct HomeView: View {
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
 
                                 VStack(alignment: .leading, spacing: 6) {
-                                    Text(tip.titleKey)
+                                    Text(tip.title)
                                         .font(.subheadline.bold())
                                         .foregroundStyle(.primary)
 
-                                    Text(tip.subtitleKey)
+                                    Text(tip.subtitle)
                                         .font(.footnote)
                                         .foregroundStyle(.secondary)
                                 }
@@ -95,39 +96,72 @@ struct HomeView: View {
             .padding(.vertical, 24)
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle("home.navigation.title")
+        .navigationTitle(String(localized: "home.navigation.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {}) {
                     Image(systemName: "gearshape")
                 }
-                .accessibilityLabel("home.navigation.settings")
+                .accessibilityLabel(String(localized: "home.navigation.settings"))
             }
+        }
+        .overlay(alignment: .top) {
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding(.top, 12)
+            }
+        }
+        .task {
+            await viewModel.loadContentIfNeeded()
+        }
+        .onChange(of: viewModel.errorMessage) { newValue in
+            presentedError = newValue
+        }
+        .alert(String(localized: "home.error.title"), isPresented: Binding(get: {
+            presentedError != nil
+        }, set: { newValue in
+            if !newValue {
+                presentedError = nil
+            }
+        })) {
+            Button(String(localized: "common.ok"), role: .cancel) {
+                presentedError = nil
+            }
+        } message: {
+            Text(presentedError ?? "")
         }
     }
 
     private var heroSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 8) {
-                Text("home.hero.title")
+                Text(String(localized: "home.hero.title"))
                     .font(.largeTitle.bold())
                     .foregroundStyle(.primary)
 
-                Text("home.hero.subtitle")
+                Text(String(localized: "home.hero.subtitle"))
                     .font(.title3)
                     .foregroundStyle(.secondary)
             }
 
             HStack(spacing: 12) {
-                Button(action: {}) {
-                    Label("home.hero.primaryAction", systemImage: "plus")
+                Button(action: {
+                    Task {
+                        await viewModel.createSamplePage()
+                    }
+                }) {
+                    Label(String(localized: "home.hero.primaryAction"), systemImage: "plus")
                         .labelStyle(.titleAndIcon)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 .accessibilityIdentifier("home-hero-primary-button")
 
-                Button(action: {}) {
-                    Label("home.hero.secondaryAction", systemImage: "bookmark")
+                Button(action: {
+                    Task {
+                        await viewModel.markFirstItemInProgress()
+                    }
+                }) {
+                    Label(String(localized: "home.hero.secondaryAction"), systemImage: "bookmark")
                         .labelStyle(.titleAndIcon)
                 }
                 .buttonStyle(.borderedProminent)
@@ -141,88 +175,7 @@ struct HomeView: View {
     }
 }
 
-private enum HomeViewData {
-    struct QuickAction: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let systemImageName: String
-    }
-
-    struct ReadingItem: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let statusKey: LocalizedStringKey?
-        let systemImageName: String
-    }
-
-    struct OfflineTip: Identifiable, Equatable {
-        let id = UUID()
-        let titleKey: LocalizedStringKey
-        let subtitleKey: LocalizedStringKey
-        let systemImageName: String
-    }
-
-    static let quickActions: [QuickAction] = [
-        QuickAction(
-            titleKey: "home.quickActions.capture.title",
-            subtitleKey: "home.quickActions.capture.subtitle",
-            systemImageName: "tray.and.arrow.down"
-        ),
-        QuickAction(
-            titleKey: "home.quickActions.collections.title",
-            subtitleKey: "home.quickActions.collections.subtitle",
-            systemImageName: "rectangle.3.group.bubble.left"
-        ),
-        QuickAction(
-            titleKey: "home.quickActions.sync.title",
-            subtitleKey: "home.quickActions.sync.subtitle",
-            systemImageName: "icloud.and.arrow.down"
-        )
-    ]
-
-    static let readingList: [ReadingItem] = [
-        ReadingItem(
-            titleKey: "home.readingList.item1.title",
-            subtitleKey: "home.readingList.item1.subtitle",
-            statusKey: "home.readingList.item.status.new",
-            systemImageName: "globe"
-        ),
-        ReadingItem(
-            titleKey: "home.readingList.item2.title",
-            subtitleKey: "home.readingList.item2.subtitle",
-            statusKey: "home.readingList.item.status.progress",
-            systemImageName: "doc.richtext"
-        ),
-        ReadingItem(
-            titleKey: "home.readingList.item3.title",
-            subtitleKey: "home.readingList.item3.subtitle",
-            statusKey: "home.readingList.item.status.completed",
-            systemImageName: "bookmark"
-        )
-    ]
-
-    static let offlineTips: [OfflineTip] = [
-        OfflineTip(
-            titleKey: "home.offlineTips.item1.title",
-            subtitleKey: "home.offlineTips.item1.subtitle",
-            systemImageName: "wifi.slash"
-        ),
-        OfflineTip(
-            titleKey: "home.offlineTips.item2.title",
-            subtitleKey: "home.offlineTips.item2.subtitle",
-            systemImageName: "square.and.arrow.down.on.square"
-        ),
-        OfflineTip(
-            titleKey: "home.offlineTips.item3.title",
-            subtitleKey: "home.offlineTips.item3.subtitle",
-            systemImageName: "bell.badge"
-        )
-    ]
-}
-
 #Preview {
-    HomeView(viewModel: HomeViewModel())
+    HomeView(viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()))
 }
 

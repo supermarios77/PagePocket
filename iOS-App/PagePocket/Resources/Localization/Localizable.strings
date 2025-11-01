@@ -1,5 +1,6 @@
 /* MARK: - Common */
 "placeholder.action.learnMore" = "Learn More";
+"common.ok" = "OK";
 
 /* MARK: - Tabs */
 "home.tab.title" = "Home";
@@ -44,6 +45,7 @@
 "home.offlineTips.item2.subtitle" = "Keep content fresh automatically";
 "home.offlineTips.item3.title" = "Stay notified";
 "home.offlineTips.item3.subtitle" = "Get alerts when downloads finish";
+"home.error.title" = "Unable to Update";
 
 /* MARK: - Browser */
 "browser.navigation.title" = "Browser";
@@ -78,6 +80,11 @@
 "browser.offlinePreview.subtitle" = "See how a saved page will look";
 "browser.offlinePreview.card.title" = "Smart capture";
 "browser.offlinePreview.card.subtitle" = "We detect the best reading format automatically";
+"browser.capture.success.title" = "Page Saved";
+"browser.capture.error.title" = "Capture Failed";
+"browser.capture.success" = "Saved \"%@\" for offline reading.";
+"browser.capture.error.invalidURL" = "That address doesn't look valid. Try adding the full link.";
+"browser.capture.error.generic" = "We couldn't save the page. Please try again shortly.";
 
 /* MARK: - Downloads */
 "downloads.navigation.title" = "Downloads";
@@ -104,3 +111,4 @@
 "downloads.actions.title" = "Next steps";
 "downloads.actions.import" = "Import from Files";
 "downloads.actions.manage" = "Manage storage";
+"downloads.actions.cancel" = "Cancel download";
