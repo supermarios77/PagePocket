@@ -55,7 +55,7 @@ struct StorageManager {
     }
 
     func downloadAssets(id: UUID, mapping: [URL: String]) async throws -> Int64 {
-        let assetsDir = try assetsDirectory(for: id)
+        let pageDir = try pageDirectory(for: id)
         var totalBytes: Int64 = 0
 
         // Limit concurrency to avoid spikes
@@ -66,7 +66,7 @@ struct StorageManager {
                 group.addTask {
                     await semaphore.wait()
                     do {
-                        let destination = assetsDir.appendingPathComponent((relativePath as NSString).lastPathComponent)
+                        let destination = pageDir.appendingPathComponent(relativePath)
                         let (bytes, _) = try await download(remoteURL: remoteURL, to: destination)
                         await semaphore.signal()
                         return bytes
@@ -83,6 +83,10 @@ struct StorageManager {
         }
 
         return totalBytes
+    }
+
+    func assetFileURL(for id: UUID, relativePath: String) throws -> URL {
+        try pageDirectory(for: id).appendingPathComponent(relativePath)
     }
 
     private func download(remoteURL: URL, to destination: URL) async throws -> (Int64, URL) {

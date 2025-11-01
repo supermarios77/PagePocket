@@ -19,14 +19,17 @@ struct PageSaveService {
     private let fetcher: PageFetcher
     private let parser: AssetParser
     private let rewriter: AssetRewriter
+    private let cssRewriter: CSSAssetRewriter
     private let cleaner: HTMLCleaner
     private let storage: StorageManager
     private let persistence: PersistenceController
     private let repository: SavedPageRepositoryProtocol
+    private let assetDirectoryName = "assets"
 
     init(fetcher: PageFetcher = PageFetcher(),
          parser: AssetParser = AssetParser(),
          rewriter: AssetRewriter = AssetRewriter(),
+         cssRewriter: CSSAssetRewriter = CSSAssetRewriter(),
          cleaner: HTMLCleaner = HTMLCleaner(),
          storage: StorageManager = StorageManager(),
          persistence: PersistenceController = .shared,
@@ -34,6 +37,7 @@ struct PageSaveService {
         self.fetcher = fetcher
         self.parser = parser
         self.rewriter = rewriter
+        self.cssRewriter = cssRewriter
         self.cleaner = cleaner
         self.storage = storage
         self.persistence = persistence
@@ -51,13 +55,15 @@ struct PageSaveService {
             htmlData = cleaner.clean(htmlData)
         }
         let assets = parser.extractAssets(from: htmlData, baseURL: url)
-        let rewritten = rewriter.rewrite(htmlData: htmlData, baseURL: url, assets: assets)
+        let rewritten = rewriter.rewrite(htmlData: htmlData, baseURL: url, assets: assets, assetDirectoryName: assetDirectoryName)
 
         let id = UUID()
         let pageDir = try storage.pageDirectory(for: id)
         let indexURL = try storage.saveIndexHTML(rewritten.htmlData, for: id)
 
-        let downloadedBytes = try await storage.downloadAssets(id: id, mapping: rewritten.assetURLToRelativePath)
+        var assetMapping = rewritten.assetURLToRelativePath
+        var downloadedBytes = try await storage.downloadAssets(id: id, mapping: assetMapping)
+        downloadedBytes += try await processStylesheets(for: id, mapping: &assetMapping)
         let indexBytes = (try? FileManager.default.attributesOfItem(atPath: indexURL.path)[.size] as? NSNumber)?.int64Value ?? 0
         let approxSize = downloadedBytes + indexBytes
 
@@ -95,6 +101,42 @@ struct PageSaveService {
             return titleContent.trimmingCharacters(in: .whitespacesAndNewlines)
         }
         return nil
+    }
+
+    private func processStylesheets(for id: UUID, mapping: inout [URL: String]) async throws -> Int64 {
+        var totalBytes: Int64 = 0
+        var processed = Set<URL>()
+        var queue: [(url: URL, path: String)] = mapping.compactMap { remote, relative in
+            guard remote.pathExtension.lowercased() == "css" else { return nil }
+            return (remote, relative)
+        }
+
+        while !queue.isEmpty {
+            let (remoteURL, relativePath) = queue.removeFirst()
+            if processed.contains(remoteURL) { continue }
+            processed.insert(remoteURL)
+
+            let localURL = try storage.assetFileURL(for: id, relativePath: relativePath)
+            guard let cssData = try? Data(contentsOf: localURL) else { continue }
+
+            let (rewrittenCSS, discovered) = cssRewriter.process(cssData: cssData,
+                                                                 baseURL: remoteURL,
+                                                                 assetDirectoryName: assetDirectoryName,
+                                                                 mapping: &mapping)
+            if rewrittenCSS != cssData {
+                try rewrittenCSS.write(to: localURL, options: .atomic)
+            }
+
+            if !discovered.isEmpty {
+                let bytes = try await storage.downloadAssets(id: id, mapping: discovered)
+                totalBytes += bytes
+                queue.append(contentsOf: discovered.compactMap { remote, relative -> (URL, String)? in
+                    remote.pathExtension.lowercased() == "css" ? (remote, relative) : nil
+                })
+            }
+        }
+
+        return totalBytes
     }
 }
 
