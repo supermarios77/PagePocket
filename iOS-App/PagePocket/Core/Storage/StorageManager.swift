@@ -65,10 +65,15 @@ struct StorageManager {
             for (remoteURL, relativePath) in mapping {
                 group.addTask {
                     await semaphore.wait()
-                    defer { semaphore.signal() }
-                    let destination = assetsDir.appendingPathComponent((relativePath as NSString).lastPathComponent)
-                    let (bytes, _) = try await download(remoteURL: remoteURL, to: destination)
-                    return bytes
+                    do {
+                        let destination = assetsDir.appendingPathComponent((relativePath as NSString).lastPathComponent)
+                        let (bytes, _) = try await download(remoteURL: remoteURL, to: destination)
+                        await semaphore.signal()
+                        return bytes
+                    } catch {
+                        await semaphore.signal()
+                        throw error
+                    }
                 }
             }
 
