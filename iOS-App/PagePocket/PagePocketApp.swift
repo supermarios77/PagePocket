@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct PagePocketApp: App {
+    @StateObject private var appEnvironment = AppEnvironment()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
         }
     }
 }
