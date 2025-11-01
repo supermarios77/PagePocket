@@ -20,34 +20,77 @@ protocol SavedPageRepositoryProtocol {
 
 struct SavedPageRepository: SavedPageRepositoryProtocol {
     func create(_ input: SavedPageInput, in context: NSManagedObjectContext) throws {
-        let entity = SavedPage(context: context)
-        entity.id = input.id
-        entity.url = input.url
-        entity.title = input.title
-        entity.savedAt = input.savedAt
-        entity.folderPath = input.folderPath
-        entity.isCleaned = input.isCleaned
-        if let approxSize = input.approxSize { entity.approxSize = approxSize }
-        try context.save()
+        var capturedError: Error?
+        context.performAndWait {
+            let entity = SavedPage(context: context)
+            entity.id = input.id
+            entity.url = input.url
+            entity.title = input.title
+            entity.savedAt = input.savedAt
+            entity.folderPath = input.folderPath
+            entity.isCleaned = input.isCleaned
+            if let approxSize = input.approxSize { entity.approxSize = approxSize }
+            do {
+                try context.save()
+            } catch {
+                capturedError = error
+            }
+        }
+        if let error = capturedError {
+            throw error
+        }
     }
 
     func fetchAll(in context: NSManagedObjectContext) throws -> [SavedPage] {
-        let request: NSFetchRequest<SavedPage> = SavedPage.fetchRequest()
-        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(SavedPage.savedAt), ascending: false)]
-        return try context.fetch(request)
+        var results: [SavedPage] = []
+        var capturedError: Error?
+        context.performAndWait {
+            let request: NSFetchRequest<SavedPage> = SavedPage.fetchRequest()
+            request.sortDescriptors = [NSSortDescriptor(key: #keyPath(SavedPage.savedAt), ascending: false)]
+            do {
+                results = try context.fetch(request)
+            } catch {
+                capturedError = error
+            }
+        }
+        if let error = capturedError {
+            throw error
+        }
+        return results
     }
 
     func delete(_ page: SavedPage, in context: NSManagedObjectContext) throws {
-        context.delete(page)
-        try context.save()
+        var capturedError: Error?
+        context.performAndWait {
+            context.delete(page)
+            do {
+                try context.save()
+            } catch {
+                capturedError = error
+            }
+        }
+        if let error = capturedError {
+            throw error
+        }
     }
 
     func delete(by id: UUID, in context: NSManagedObjectContext) throws {
-        let request: NSFetchRequest<SavedPage> = SavedPage.fetchRequest()
-        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
-        request.fetchLimit = 1
-        if let page = try context.fetch(request).first {
-            try delete(page, in: context)
+        var capturedError: Error?
+        context.performAndWait {
+            let request: NSFetchRequest<SavedPage> = SavedPage.fetchRequest()
+            request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+            request.fetchLimit = 1
+            do {
+                if let page = try context.fetch(request).first {
+                    context.delete(page)
+                    try context.save()
+                }
+            } catch {
+                capturedError = error
+            }
+        }
+        if let error = capturedError {
+            throw error
         }
     }
 }

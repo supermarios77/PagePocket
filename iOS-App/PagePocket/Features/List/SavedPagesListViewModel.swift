@@ -2,6 +2,7 @@ import Foundation
 import Combine
 import CoreData
 
+@MainActor
 final class SavedPagesListViewModel: ObservableObject {
     @Published var pages: [SavedPage] = []
     @Published var errorMessage: String?
@@ -15,6 +16,7 @@ final class SavedPagesListViewModel: ObservableObject {
     }
 
     func load() {
+        errorMessage = nil
         do {
             pages = try repository.fetchAll(in: persistence.viewContext)
         } catch {
@@ -23,7 +25,7 @@ final class SavedPagesListViewModel: ObservableObject {
     }
 
     func delete(at offsets: IndexSet) {
-        for index in offsets {
+        for index in offsets.sorted(by: >) {
             let page = pages[index]
             do {
                 try repository.delete(page, in: persistence.viewContext)
