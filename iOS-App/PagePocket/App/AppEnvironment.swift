@@ -37,7 +37,8 @@ final class AppEnvironment: ObservableObject {
             ?? DefaultOfflineReaderService(networkClient: networkClient, storageProvider: activeStorageProvider)
 
         self.downloadService = downloadService
-            ?? InMemoryDownloadService(
+            ?? DefaultDownloadService(
+                offlineReaderService: self.offlineReaderService,
                 active: AppEnvironment.seedActiveDownloads,
                 completed: AppEnvironment.seedCompletedDownloads
             )
@@ -167,6 +168,7 @@ private extension AppEnvironment {
         guard (try? await storageProvider.loadPages().isEmpty) == true else { return }
         for page in AppEnvironment.seedPages {
             try? await storageProvider.store(page: page)
+            NotificationCenter.default.post(name: .offlineReaderPageSaved, object: page.id)
         }
     }
 }

@@ -15,6 +15,7 @@ final class DownloadsViewModel: ObservableObject {
         let status: String
         let systemImageName: String
         let progress: Double?
+        let failureReason: String?
 
         init(record: DownloadRecord) {
             id = record.id
@@ -23,6 +24,11 @@ final class DownloadsViewModel: ObservableObject {
             status = record.status.localizedDescription
             systemImageName = record.status.systemImageName
             progress = record.progressValue
+            if case let .failed(reason) = record.status {
+                failureReason = reason
+            } else {
+                failureReason = nil
+            }
         }
     }
 
@@ -32,9 +38,16 @@ final class DownloadsViewModel: ObservableObject {
 
     private let downloadService: DownloadService
     private var hasLoaded = false
+    private var updatesTask: Task<Void, Never>?
 
     init(downloadService: DownloadService) {
         self.downloadService = downloadService
+        updatesTask = Task { [weak self] in
+            guard let self else { return }
+            for await _ in downloadService.updates() {
+                await self.loadSnapshots()
+            }
+        }
     }
 
     func loadContentIfNeeded() async {
@@ -46,7 +59,14 @@ final class DownloadsViewModel: ObservableObject {
     func refresh() async {
         isLoading = true
         defer { isLoading = false }
+        await loadSnapshots()
+    }
 
+    func cancelDownload(id: UUID) async {
+        await downloadService.cancelDownload(id: id)
+    }
+
+    private func loadSnapshots() async {
         async let active = downloadService.fetchActiveDownloads()
         async let completed = downloadService.fetchCompletedDownloads()
 
@@ -55,9 +75,8 @@ final class DownloadsViewModel: ObservableObject {
         completedDownloads = results.1.map(DownloadRow.init)
     }
 
-    func cancelDownload(id: UUID) async {
-        await downloadService.cancelDownload(id: id)
-        await refresh()
+    deinit {
+        updatesTask?.cancel()
     }
 }
 

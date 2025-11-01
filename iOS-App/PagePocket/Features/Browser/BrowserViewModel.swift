@@ -15,20 +15,23 @@ final class BrowserViewModel: ObservableObject {
         let status: String
         let systemImageName: String
 
-        init(session: BrowsingSession) {
-            id = session.id
-            title = session.title
-            subtitle = session.url.host ?? session.url.absoluteString
-            status = session.syncState.localizedDescription
-            systemImageName = RecentSessionViewData.icon(for: session)
+        init(page: SavedPage) {
+            id = page.id
+            title = page.title
+            subtitle = page.source
+            status = page.status.localizedDescription
+            systemImageName = RecentSessionViewData.icon(for: page)
         }
 
-        private static func icon(for session: BrowsingSession) -> String {
-            let host = session.url.host ?? ""
-            if host.contains("design") || host.contains("dribbble") {
-                return "newspaper"
+        private static func icon(for page: SavedPage) -> String {
+            switch page.contentType {
+            case .article:
+                return "doc.text.magnifyingglass"
+            case .collection:
+                return "rectangle.3.group.bubble.left"
+            case .document:
+                return "doc.richtext"
             }
-            return "doc.text.magnifyingglass"
         }
     }
 
@@ -76,14 +79,33 @@ final class BrowserViewModel: ObservableObject {
 
     private let offlineReaderService: OfflineReaderService
     private let browsingExperienceService: BrowsingExperienceService
+    private let downloadService: DownloadService
     private var hasLoaded = false
+    private var notificationTasks: [Task<Void, Never>] = []
 
     init(
         offlineReaderService: OfflineReaderService,
-        browsingExperienceService: BrowsingExperienceService
+        browsingExperienceService: BrowsingExperienceService,
+        downloadService: DownloadService
     ) {
         self.offlineReaderService = offlineReaderService
         self.browsingExperienceService = browsingExperienceService
+        self.downloadService = downloadService
+
+        let notificationNames: [Notification.Name] = [
+            .offlineReaderPageSaved,
+            .offlineReaderPageDeleted,
+            .offlineReaderPageUpdated
+        ]
+
+        notificationTasks = notificationNames.map { name in
+            Task { [weak self] in
+                guard let self else { return }
+                for await _ in NotificationCenter.default.notifications(named: name) {
+                    await self.loadContent()
+                }
+            }
+        }
     }
 
     func loadContentIfNeeded() async {
@@ -96,12 +118,19 @@ final class BrowserViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        async let sessions = browsingExperienceService.loadRecentSessions()
-        async let actions = browsingExperienceService.loadSuggestedActions()
+        async let pagesTask = offlineReaderService.listSavedPages()
+        async let actionsTask = browsingExperienceService.loadSuggestedActions()
 
-        let results = await (sessions, actions)
-        recentSessions = results.0.map(RecentSessionViewData.init)
-        suggestedActions = results.1.map(SuggestedActionViewData.init)
+        do {
+            let savedPages = try await pagesTask
+            let suggested = await actionsTask
+            recentSessions = savedPages.prefix(5).map(RecentSessionViewData.init)
+            suggestedActions = suggested.map(SuggestedActionViewData.init)
+        } catch {
+            let suggested = await actionsTask
+            suggestedActions = suggested.map(SuggestedActionViewData.init)
+            captureFeedback = CaptureFeedback(kind: .failure(message: error.localizedDescription))
+        }
     }
 
     func captureCurrentQuery() async {
@@ -117,7 +146,7 @@ final class BrowserViewModel: ObservableObject {
         defer { isCapturing = false }
 
         do {
-            let page = try await offlineReaderService.savePage(from: url)
+            let page = try await downloadService.enqueueCapture(from: url)
             captureFeedback = CaptureFeedback(
                 kind: .success(
                     message: String.localizedStringWithFormat(
@@ -131,10 +160,20 @@ final class BrowserViewModel: ObservableObject {
             )
             query = ""
         } catch {
-            captureFeedback = CaptureFeedback(
-                kind: .failure(message: String(localized: "browser.capture.error.generic"))
-            )
+            if (error as NSError).code == NSUserCancelledError {
+                captureFeedback = CaptureFeedback(
+                    kind: .failure(message: String(localized: "downloads.actions.cancelled"))
+                )
+            } else {
+                captureFeedback = CaptureFeedback(
+                    kind: .failure(message: String(localized: "browser.capture.error.generic"))
+                )
+            }
         }
+    }
+
+    func makeReaderViewModel(for pageID: UUID) -> OfflineReaderViewModel {
+        OfflineReaderViewModel(pageID: pageID, offlineReaderService: offlineReaderService)
     }
 
     private func normalizeURL(from text: String) -> URL? {
@@ -147,6 +186,10 @@ final class BrowserViewModel: ObservableObject {
 
         let prefixed = "https://" + trimmed
         return URL(string: prefixed)
+    }
+
+    deinit {
+        notificationTasks.forEach { $0.cancel() }
     }
 }
 

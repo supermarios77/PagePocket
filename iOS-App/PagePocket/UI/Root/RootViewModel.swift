@@ -15,7 +15,8 @@ final class RootViewModel: ObservableObject {
     func makeBrowserViewModel() -> BrowserViewModel {
         BrowserViewModel(
             offlineReaderService: appEnvironment.offlineReaderService,
-            browsingExperienceService: appEnvironment.browsingExperienceService
+            browsingExperienceService: appEnvironment.browsingExperienceService,
+            downloadService: appEnvironment.downloadService
         )
     }
 

@@ -60,6 +60,7 @@
 
 "browser.recentSessions.title" = "Recent sessions";
 "browser.recentSessions.subtitle" = "Pick up where you left off";
+"browser.recentSessions.empty" = "Save a page to see it appear here.";
 "browser.recentSessions.item1.title" = "Offline architecture patterns";
 "browser.recentSessions.item1.subtitle" = "appleinsider.com";
 "browser.recentSessions.item2.title" = "Minimal browser UI inspirations";
@@ -109,11 +110,13 @@
 "downloads.completed.item2.subtitle" = "Document • 5 MB";
 "downloads.completed.item.status.available" = "Available";
 "downloads.completed.item.status.archived" = "Archived";
+"downloads.completed.item.status.failed" = "Failed";
 
 "downloads.actions.title" = "Next steps";
 "downloads.actions.import" = "Import from Files";
 "downloads.actions.manage" = "Manage storage";
 "downloads.actions.cancel" = "Cancel download";
+"downloads.actions.cancelled" = "Cancelled";
 
 /* MARK: - Reader */
 "reader.loading" = "Loading offline content…";

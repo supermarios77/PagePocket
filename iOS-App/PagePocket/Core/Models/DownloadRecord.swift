@@ -6,6 +6,7 @@ struct DownloadRecord: Identifiable, Hashable {
         case inProgress(progress: Double)
         case available
         case archived
+        case failed(reason: String)
 
         var localizedDescription: String {
             switch self {
@@ -17,6 +18,8 @@ struct DownloadRecord: Identifiable, Hashable {
                 String(localized: "downloads.completed.item.status.available")
             case .archived:
                 String(localized: "downloads.completed.item.status.archived")
+            case .failed:
+                String(localized: "downloads.completed.item.status.failed", defaultValue: "Failed")
             }
         }
 
@@ -28,6 +31,8 @@ struct DownloadRecord: Identifiable, Hashable {
                 "checkmark.circle"
             case .archived:
                 "archivebox"
+            case .failed:
+                "exclamationmark.triangle"
             }
         }
     }

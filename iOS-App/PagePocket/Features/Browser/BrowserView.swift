@@ -25,18 +25,36 @@ struct BrowserView: View {
                     )
 
                     VStack(spacing: 16) {
-                        ForEach(viewModel.recentSessions) { session in
-                            PlaceholderListRow(
-                                title: session.title,
-                                subtitle: session.subtitle,
-                                status: session.status,
-                                systemImageName: session.systemImageName
-                            )
-                            .padding(.horizontal, 20)
-                            .background(
-                                RoundedRectangle(cornerRadius: 18)
-                                    .fill(Color(.secondarySystemBackground))
-                            )
+                        if viewModel.recentSessions.isEmpty {
+                            Text(String(localized: "browser.recentSessions.empty"))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(20)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .fill(Color(.secondarySystemBackground))
+                                )
+                        } else {
+                            ForEach(viewModel.recentSessions) { session in
+                                NavigationLink {
+                                    OfflineReaderView(viewModel: viewModel.makeReaderViewModel(for: session.id))
+                                } label: {
+                                    PlaceholderListRow(
+                                        title: session.title,
+                                        subtitle: session.subtitle,
+                                        status: session.status,
+                                        systemImageName: session.systemImageName
+                                    )
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 18)
+                                            .fill(Color(.secondarySystemBackground))
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
                         }
                     }
                 }
@@ -183,12 +201,26 @@ struct BrowserView: View {
 }
 
 #Preview {
+    let previewOfflineService = StubOfflineReaderService()
+    let previewDownloadService = PreviewDownloadService()
     BrowserView(
         viewModel: BrowserViewModel(
-            offlineReaderService: StubOfflineReaderService(),
-            browsingExperienceService: InMemoryBrowsingExperienceService()
+            offlineReaderService: previewOfflineService,
+            browsingExperienceService: InMemoryBrowsingExperienceService(),
+            downloadService: previewDownloadService
         )
     )
+}
+
+@MainActor
+private final class PreviewDownloadService: DownloadService {
+    func fetchActiveDownloads() async -> [DownloadRecord] { [] }
+    func fetchCompletedDownloads() async -> [DownloadRecord] { [] }
+    func cancelDownload(id: UUID) async {}
+    func updates() -> AsyncStream<Void> { AsyncStream { $0.finish() } }
+    func enqueueCapture(from url: URL) async throws -> SavedPage {
+        SavedPage(title: url.absoluteString, url: url)
+    }
 }
 
 
