@@ -120,10 +120,12 @@ final class BrowserViewModel: ObservableObject {
             let page = try await offlineReaderService.savePage(from: url)
             captureFeedback = CaptureFeedback(
                 kind: .success(
-                    message: String(
-                        localized: "browser.capture.success",
-                        comment: "Success message after capturing a page",
-                        arguments: page.title
+                    message: String.localizedStringWithFormat(
+                        String(
+                            localized: "browser.capture.success",
+                            comment: "Success message after capturing a page"
+                        ),
+                        page.title
                     )
                 )
             )
