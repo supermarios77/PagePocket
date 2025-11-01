@@ -34,11 +34,15 @@ final class HomeViewModel: ObservableObject {
         let subtitle: String
         let status: String
         let systemImageName: String
+        let estimatedReadMinutes: Int
 
         init(page: SavedPage) {
             self.id = page.id
             self.title = page.title
-            self.subtitle = page.source
+            let minutes = max(Int(round(page.estimatedReadTime / 60)), 1)
+            self.estimatedReadMinutes = minutes
+            let readTime = HomeViewModel.readTimeDescription(for: minutes)
+            self.subtitle = "\(page.source) • \(readTime)"
             self.status = page.status.localizedDescription
             self.systemImageName = page.contentType.systemImageName
         }
@@ -77,11 +81,27 @@ final class HomeViewModel: ObservableObject {
 
     private let offlineReaderService: OfflineReaderService
     private var hasLoadedContent = false
+    private var cancellables: Set<AnyCancellable> = []
 
     init(offlineReaderService: OfflineReaderService) {
         self.offlineReaderService = offlineReaderService
         self.quickActions = QuickAction.defaults
         self.offlineTips = OfflineTip.defaults
+
+        let notificationNames: [Notification.Name] = [
+            .offlineReaderPageSaved,
+            .offlineReaderPageDeleted,
+            .offlineReaderPageUpdated
+        ]
+
+        for name in notificationNames {
+            NotificationCenter.default.publisher(for: name)
+                .sink { [weak self] _ in
+                    guard let self else { return }
+                    Task { await self.refreshReadingList() }
+                }
+                .store(in: &cancellables)
+        }
     }
 
     func loadContentIfNeeded() async {
@@ -119,6 +139,10 @@ final class HomeViewModel: ObservableObject {
         await updateStatus(for: first.id, status: .inProgress)
     }
 
+    func makeReaderViewModel(for pageID: UUID) -> OfflineReaderViewModel {
+        OfflineReaderViewModel(pageID: pageID, offlineReaderService: offlineReaderService)
+    }
+
     private func updateStatus(for pageID: UUID, status: SavedPage.Status) async {
         do {
             try await offlineReaderService.updateStatus(for: pageID, status: status)
@@ -126,6 +150,16 @@ final class HomeViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private static func readTimeDescription(for minutes: Int) -> String {
+        if minutes == 1 {
+            return String(localized: "home.readingList.readTime.one")
+        }
+        return String.localizedStringWithFormat(
+            String(localized: "home.readingList.readTime.many"),
+            minutes
+        )
     }
 }
 

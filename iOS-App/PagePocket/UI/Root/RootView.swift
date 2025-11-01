@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
     @StateObject private var viewModel: RootViewModel
@@ -35,5 +36,6 @@ struct RootView: View {
 
 #Preview {
     RootView(viewModel: RootViewModel(appEnvironment: AppEnvironment()))
+        .modelContainer(for: SavedPageEntity.self, inMemory: true)
 }
 

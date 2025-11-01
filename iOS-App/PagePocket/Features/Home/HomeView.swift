@@ -38,12 +38,17 @@ struct HomeView: View {
 
                 VStack(spacing: 0) {
                     ForEach(viewModel.readingList) { item in
-                        PlaceholderListRow(
-                            title: item.title,
-                            subtitle: item.subtitle,
-                            status: item.status,
-                            systemImageName: item.systemImageName
-                        )
+                        NavigationLink {
+                            OfflineReaderView(viewModel: viewModel.makeReaderViewModel(for: item.id))
+                        } label: {
+                            PlaceholderListRow(
+                                title: item.title,
+                                subtitle: item.subtitle,
+                                status: item.status,
+                                systemImageName: item.systemImageName
+                            )
+                        }
+                        .buttonStyle(.plain)
 
                         if item.id != viewModel.readingList.last?.id {
                             Divider()

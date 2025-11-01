@@ -1,8 +1,11 @@
 import Combine
 import Foundation
+import SwiftData
 
 @MainActor
 final class AppEnvironment: ObservableObject {
+    let modelContainer: ModelContainer
+    let modelContext: ModelContext
     let networkClient: NetworkClient
     let storageProvider: StorageProvider
     let offlineReaderService: OfflineReaderService
@@ -18,11 +21,20 @@ final class AppEnvironment: ObservableObject {
     ) {
         self.networkClient = networkClient
 
-        let seededStorage = storageProvider ?? InMemoryStorageProvider(seedPages: AppEnvironment.seedPages)
-        self.storageProvider = seededStorage
+        let container: ModelContainer
+        do {
+            container = try ModelContainer(for: SavedPageEntity.self)
+        } catch {
+            fatalError("Failed to initialize SwiftData container: \(error.localizedDescription)")
+        }
+        self.modelContainer = container
+        self.modelContext = ModelContext(container)
+
+        let activeStorageProvider = storageProvider ?? SwiftDataStorageProvider(context: modelContext)
+        self.storageProvider = activeStorageProvider
 
         self.offlineReaderService = offlineReaderService
-            ?? DefaultOfflineReaderService(networkClient: networkClient, storageProvider: seededStorage)
+            ?? DefaultOfflineReaderService(networkClient: networkClient, storageProvider: activeStorageProvider)
 
         self.downloadService = downloadService
             ?? InMemoryDownloadService(
@@ -35,6 +47,11 @@ final class AppEnvironment: ObservableObject {
                 sessions: AppEnvironment.seedBrowsingSessions,
                 actions: AppEnvironment.seedSuggestedActions
             )
+
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            await self.seedInitialContentIfNeeded()
+        }
     }
 }
 
@@ -46,7 +63,9 @@ private extension AppEnvironment {
             source: "developer.apple.com",
             createdAt: Date().addingTimeInterval(-3_600),
             status: .new,
-            contentType: .article
+            contentType: .article,
+            htmlContent: SeedHTML.swiftUIPractices,
+            estimatedReadTime: SavedPage.estimateReadTime(for: SeedHTML.swiftUIPractices)
         ),
         SavedPage(
             title: "Designing Seamless Reader Experiences",
@@ -54,7 +73,9 @@ private extension AppEnvironment {
             source: "medium.com",
             createdAt: Date().addingTimeInterval(-21_600),
             status: .inProgress,
-            contentType: .article
+            contentType: .article,
+            htmlContent: SeedHTML.readerExperiences,
+            estimatedReadTime: SavedPage.estimateReadTime(for: SeedHTML.readerExperiences)
         ),
         SavedPage(
             title: "Caching Strategies for iOS",
@@ -62,7 +83,9 @@ private extension AppEnvironment {
             source: "kodeco.com",
             createdAt: Date().addingTimeInterval(-48_600),
             status: .completed,
-            contentType: .document
+            contentType: .document,
+            htmlContent: SeedHTML.cachingStrategies,
+            estimatedReadTime: SavedPage.estimateReadTime(for: SeedHTML.cachingStrategies)
         )
     ]
 
@@ -140,5 +163,25 @@ private extension AppEnvironment {
         }
         return url
     }
+    func seedInitialContentIfNeeded() async {
+        guard (try? await storageProvider.loadPages().isEmpty) == true else { return }
+        for page in AppEnvironment.seedPages {
+            try? await storageProvider.store(page: page)
+        }
+    }
+}
+
+private enum SeedHTML {
+    static let swiftUIPractices = """
+    <html><body><h1>SwiftUI Offline Best Practices</h1><p>Learn how to structure offline-first experiences using SwiftUI's modern data APIs...</p></body></html>
+    """
+
+    static let readerExperiences = """
+    <html><body><h1>Designing Seamless Reader Experiences</h1><p>Delight your readers with typography, layout, and offline-ready design systems.</p></body></html>
+    """
+
+    static let cachingStrategies = """
+    <html><body><h1>Caching Strategies for iOS</h1><p>Balance freshness and performance with layered caching, background refresh, and heuristics.</p></body></html>
+    """
 }
 

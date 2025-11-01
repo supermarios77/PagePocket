@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct PagePocketApp: App {
@@ -14,6 +15,7 @@ struct PagePocketApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
+                .modelContainer(appEnvironment.modelContainer)
         }
     }
 }

@@ -46,6 +46,8 @@
 "home.offlineTips.item3.title" = "Stay notified";
 "home.offlineTips.item3.subtitle" = "Get alerts when downloads finish";
 "home.error.title" = "Unable to Update";
+"home.readingList.readTime.one" = "1 min read";
+"home.readingList.readTime.many" = "%d min read";
 
 /* MARK: - Browser */
 "browser.navigation.title" = "Browser";
@@ -112,3 +114,8 @@
 "downloads.actions.import" = "Import from Files";
 "downloads.actions.manage" = "Manage storage";
 "downloads.actions.cancel" = "Cancel download";
+
+/* MARK: - Reader */
+"reader.loading" = "Loading offline content…";
+"reader.error.unavailable" = "We couldn't load this page offline.";
+"reader.toolbar.share" = "Share";
