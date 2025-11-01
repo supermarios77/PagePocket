@@ -11,26 +11,23 @@ struct RootView: View {
         TabView {
             NavigationStack {
                 HomeView(viewModel: viewModel.makeHomeViewModel())
-                    .navigationTitle("placeholder.root.title")
             }
             .tabItem {
-                Label("placeholder.home.tab", systemImage: "house")
+                Label("home.tab.title", systemImage: "house")
             }
 
             NavigationStack {
                 BrowserView(viewModel: viewModel.makeBrowserViewModel())
-                    .navigationTitle("placeholder.browser.message")
             }
             .tabItem {
-                Label("placeholder.browser.tab", systemImage: "safari")
+                Label("browser.tab.title", systemImage: "safari")
             }
 
             NavigationStack {
                 DownloadsView(viewModel: viewModel.makeDownloadsViewModel())
-                    .navigationTitle("placeholder.downloads.message")
             }
             .tabItem {
-                Label("placeholder.downloads.tab", systemImage: "arrow.down.circle")
+                Label("downloads.tab.title", systemImage: "arrow.down.circle")
             }
         }
     }

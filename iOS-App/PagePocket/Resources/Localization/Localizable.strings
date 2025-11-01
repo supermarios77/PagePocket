@@ -1,8 +1,106 @@
-"placeholder.root.title" = "PagePocket";
-"placeholder.home.message" = "Home View Placeholder";
-"placeholder.home.tab" = "Home";
-"placeholder.browser.message" = "Browser View Placeholder";
-"placeholder.browser.tab" = "Browser";
-"placeholder.downloads.message" = "Downloads View Placeholder";
-"placeholder.downloads.tab" = "Downloads";
+/* MARK: - Common */
+"placeholder.action.learnMore" = "Learn More";
 
+/* MARK: - Tabs */
+"home.tab.title" = "Home";
+"browser.tab.title" = "Browse";
+"downloads.tab.title" = "Downloads";
+
+/* MARK: - Home */
+"home.navigation.title" = "PagePocket";
+"home.navigation.settings" = "Open Settings";
+
+"home.hero.title" = "Your offline reading hub";
+"home.hero.subtitle" = "Capture pages, organize collections, and stay productive without a connection.";
+"home.hero.primaryAction" = "Save New Page";
+"home.hero.secondaryAction" = "View Library";
+
+"home.quickActions.title" = "Quick actions";
+"home.quickActions.subtitle" = "Jump back into your most common workflows";
+"home.quickActions.capture.title" = "Capture for offline";
+"home.quickActions.capture.subtitle" = "Download a page and keep it in sync";
+"home.quickActions.collections.title" = "Organize collections";
+"home.quickActions.collections.subtitle" = "Group articles and stories your way";
+"home.quickActions.sync.title" = "Sync devices";
+"home.quickActions.sync.subtitle" = "Refresh content across all devices";
+
+"home.readingList.title" = "Reading list";
+"home.readingList.subtitle" = "Recently saved articles and documents";
+"home.readingList.item1.title" = "SwiftUI Offline Best Practices";
+"home.readingList.item1.subtitle" = "developer.apple.com";
+"home.readingList.item2.title" = "Designing Seamless Reader Experiences";
+"home.readingList.item2.subtitle" = "medium.com";
+"home.readingList.item3.title" = "Caching Strategies for iOS";
+"home.readingList.item3.subtitle" = "raywenderlich.com";
+"home.readingList.item.status.new" = "New";
+"home.readingList.item.status.progress" = "In Progress";
+"home.readingList.item.status.completed" = "Completed";
+
+"home.offlineTips.title" = "Offline mastery";
+"home.offlineTips.subtitle" = "Set up the essentials before travelling";
+"home.offlineTips.item1.title" = "Preload your must-read list";
+"home.offlineTips.item1.subtitle" = "Download key sites before you go";
+"home.offlineTips.item2.title" = "Enable background refresh";
+"home.offlineTips.item2.subtitle" = "Keep content fresh automatically";
+"home.offlineTips.item3.title" = "Stay notified";
+"home.offlineTips.item3.subtitle" = "Get alerts when downloads finish";
+
+/* MARK: - Browser */
+"browser.navigation.title" = "Browser";
+"browser.navigation.menu" = "Open browser actions";
+"browser.keyboard.dismiss" = "Clear";
+
+"browser.search.title" = "Capture a new page";
+"browser.search.placeholder" = "Paste or type a URL";
+"browser.search.action" = "Open in Reader";
+
+"browser.recentSessions.title" = "Recent sessions";
+"browser.recentSessions.subtitle" = "Pick up where you left off";
+"browser.recentSessions.item1.title" = "Offline architecture patterns";
+"browser.recentSessions.item1.subtitle" = "appleinsider.com";
+"browser.recentSessions.item2.title" = "Minimal browser UI inspirations";
+"browser.recentSessions.item2.subtitle" = "dribbble.com";
+"browser.recentSessions.item.status.synced" = "Synced";
+"browser.recentSessions.item.status.updated" = "Updated";
+
+"browser.suggestedActions.title" = "Suggested actions";
+"browser.suggestedActions.subtitle" = "Helpful tools for faster saving";
+"browser.suggestedActions.item1.title" = "Bookmark for later";
+"browser.suggestedActions.item1.subtitle" = "Add to a curated list";
+"browser.suggestedActions.item2.title" = "Resume last tab";
+"browser.suggestedActions.item2.subtitle" = "Reopen your previous session";
+"browser.suggestedActions.item3.title" = "Explore offline catalog";
+"browser.suggestedActions.item3.subtitle" = "See community favorites";
+"browser.suggestedActions.item4.title" = "Archive for travel";
+"browser.suggestedActions.item4.subtitle" = "Keep content lightweight";
+
+"browser.offlinePreview.title" = "Offline preview";
+"browser.offlinePreview.subtitle" = "See how a saved page will look";
+"browser.offlinePreview.card.title" = "Smart capture";
+"browser.offlinePreview.card.subtitle" = "We detect the best reading format automatically";
+
+/* MARK: - Downloads */
+"downloads.navigation.title" = "Downloads";
+"downloads.navigation.menu" = "Open downloads actions";
+
+"downloads.active.title" = "Active downloads";
+"downloads.active.subtitle" = "Currently processing content";
+"downloads.active.item1.title" = "Offline-first API Guidelines";
+"downloads.active.item1.subtitle" = "Reading list • 12 MB";
+"downloads.active.item2.title" = "Curated UI Inspirations";
+"downloads.active.item2.subtitle" = "Collection • 37 MB";
+"downloads.active.item.status.pending" = "Pending";
+"downloads.active.item.status.inProgress" = "Downloading";
+
+"downloads.completed.title" = "Available offline";
+"downloads.completed.subtitle" = "Saved and ready to view";
+"downloads.completed.item1.title" = "SwiftData Essentials";
+"downloads.completed.item1.subtitle" = "Guide • 9 MB";
+"downloads.completed.item2.title" = "Accessibility Checklist";
+"downloads.completed.item2.subtitle" = "Document • 5 MB";
+"downloads.completed.item.status.available" = "Available";
+"downloads.completed.item.status.archived" = "Archived";
+
+"downloads.actions.title" = "Next steps";
+"downloads.actions.import" = "Import from Files";
+"downloads.actions.manage" = "Manage storage";
