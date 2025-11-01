@@ -85,19 +85,10 @@ struct SavedPage: Identifiable, Hashable {
     }
 
     private static func stripHTML(_ html: String) -> String {
-        if let data = html.data(using: .utf8),
-           let attributed = try? NSAttributedString(
-               data: data,
-               options: [
-                   .documentType: NSAttributedString.DocumentType.html,
-                   .characterEncoding: String.Encoding.utf8.rawValue
-               ],
-               documentAttributes: nil
-           ) {
-            return attributed.string
-        }
-
-        return html.replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
+        return html
+            .replacingOccurrences(of: "<style[\\s\\S]*?</style>", with: " ", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: "<script[\\s\\S]*?</script>", with: " ", options: [.regularExpression, .caseInsensitive])
+            .replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
             .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }

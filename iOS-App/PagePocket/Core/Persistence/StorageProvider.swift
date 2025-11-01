@@ -64,7 +64,8 @@ final class SwiftDataStorageProvider: StorageProvider {
 
     private func fetchEntity(with id: UUID) throws -> SavedPageEntity? {
         let predicate = #Predicate<SavedPageEntity> { $0.id == id }
-        let descriptor = FetchDescriptor(predicate: predicate, fetchLimit: 1)
+        var descriptor = FetchDescriptor<SavedPageEntity>(predicate: predicate)
+        descriptor.fetchLimit = 1
         return try context.fetch(descriptor).first
     }
 
