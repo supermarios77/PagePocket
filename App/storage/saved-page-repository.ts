@@ -1,3 +1,5 @@
+import * as FileSystem from 'expo-file-system/legacy';
+
 import { getDatabase } from '@/storage/database';
 import { emitSavedPagesEvent } from '@/storage/events';
 import {
@@ -32,6 +34,21 @@ function nowISO() {
 
 async function notify(event: SavedPageChangeEvent) {
   emitSavedPagesEvent(event);
+}
+
+async function deleteFileIfExists(fileUri: string | null) {
+  if (!fileUri) {
+    return;
+  }
+
+  try {
+    const info = await FileSystem.getInfoAsync(fileUri);
+    if (info.exists) {
+      await FileSystem.deleteAsync(fileUri, { idempotent: true });
+    }
+  } catch (error) {
+    console.warn('Failed to remove saved page file', fileUri, error);
+  }
 }
 
 export async function listSavedPages(): Promise<SavedPage[]> {
@@ -161,13 +178,18 @@ export async function transitionSavedPage(id: number, status: SavedPageStatus, l
 
 export async function deleteSavedPage(id: number): Promise<void> {
   const db = await getDatabase();
+  const existing = await getSavedPageById(id);
+
   await db.runAsync('DELETE FROM saved_pages WHERE id = ?', id);
+  await deleteFileIfExists(existing?.fileUri ?? null);
   await notify({ type: 'deleted', pageId: id });
 }
 
 export async function clearSavedPages(): Promise<void> {
   const db = await getDatabase();
+  const pages = await listSavedPages();
   await db.runAsync('DELETE FROM saved_pages');
+  await Promise.all(pages.map((page) => deleteFileIfExists(page.fileUri)));
   await notify({ type: 'deleted', pageId: -1 });
 }
 
