@@ -2,10 +2,12 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
+    @Binding var selectedTab: RootView.Tab?
     @State private var presentedError: String?
 
-    init(viewModel: HomeViewModel) {
+    init(viewModel: HomeViewModel, selectedTab: Binding<RootView.Tab?>) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        _selectedTab = selectedTab
     }
 
     var body: some View {
@@ -21,11 +23,16 @@ struct HomeView: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 16) {
                         ForEach(viewModel.quickActions) { action in
-                            PlaceholderCard(
-                                title: action.title,
-                                description: action.subtitle,
-                                systemImageName: action.systemImageName
-                            )
+                            Button(action: {
+                                handleQuickAction(action)
+                            }) {
+                                PlaceholderCard(
+                                    title: action.title,
+                                    description: action.subtitle,
+                                    systemImageName: action.systemImageName
+                                )
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .padding(.horizontal, 2)
@@ -186,9 +193,25 @@ struct HomeView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
+
+    private func handleQuickAction(_ action: HomeViewModel.QuickAction) {
+        switch action.action {
+        case .navigateToBrowser:
+            selectedTab = RootView.Tab.browser
+        case .navigateToCollections:
+            // Placeholder - Collections not implemented yet
+            break
+        case .navigateToSync:
+            // Placeholder - Sync not implemented yet
+            break
+        }
+    }
 }
 
 #Preview {
-    HomeView(viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()))
+    HomeView(
+        viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()),
+        selectedTab: .constant(.home)
+    )
 }
 

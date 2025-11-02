@@ -8,22 +8,32 @@ final class HomeViewModel: ObservableObject {
         let title: String
         let subtitle: String
         let systemImageName: String
+        let action: ActionType
+        
+        enum ActionType {
+            case navigateToBrowser
+            case navigateToCollections
+            case navigateToSync
+        }
 
         static let defaults: [QuickAction] = [
             QuickAction(
                 title: String(localized: "home.quickActions.capture.title"),
                 subtitle: String(localized: "home.quickActions.capture.subtitle"),
-                systemImageName: "tray.and.arrow.down"
+                systemImageName: "tray.and.arrow.down",
+                action: .navigateToBrowser
             ),
             QuickAction(
                 title: String(localized: "home.quickActions.collections.title"),
                 subtitle: String(localized: "home.quickActions.collections.subtitle"),
-                systemImageName: "rectangle.3.group.bubble.left"
+                systemImageName: "rectangle.3.group.bubble.left",
+                action: .navigateToCollections
             ),
             QuickAction(
                 title: String(localized: "home.quickActions.sync.title"),
                 subtitle: String(localized: "home.quickActions.sync.subtitle"),
-                systemImageName: "icloud.and.arrow.down"
+                systemImageName: "icloud.and.arrow.down",
+                action: .navigateToSync
             )
         ]
     }
