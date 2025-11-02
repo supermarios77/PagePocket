@@ -9,7 +9,7 @@ import StoreKit
 
 /// Production StoreKit 2 implementation of PurchaseService
 actor StoreKit2PurchaseService: PurchaseService {
-    private(set) var currentEntitlements: SubscriptionEntitlements
+    nonisolated(unsafe) private(set) var currentEntitlements: SubscriptionEntitlements
     private var products: [Product] = []
     private var updateListenerTask: Task<Void, Never>?
     private var observers: [UUID: AsyncStream<SubscriptionEntitlements>.Continuation] = [:]

@@ -8,7 +8,7 @@ import Foundation
 /// Mock implementation of PurchaseService for testing and development
 /// This simulates StoreKit behavior without requiring App Store Connect setup
 actor MockPurchaseService: PurchaseService {
-    private(set) var currentEntitlements: SubscriptionEntitlements
+    nonisolated(unsafe) private(set) var currentEntitlements: SubscriptionEntitlements
     private var observers: [UUID: AsyncStream<SubscriptionEntitlements>.Continuation] = [:]
     private var isPremiumOverride: Bool = false // Allow manual override in testing
     
