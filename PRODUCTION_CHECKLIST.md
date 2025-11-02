@@ -109,6 +109,9 @@ xcodebuild archive \
 **Test Scenarios:**
 - [ ] Free user can save 2 pages (limit enforced)
 - [ ] Premium purchase flow works
+- [ ] **After testing IAP: Clear app data to test fresh install**
+  - Settings > General > iPhone Storage > PagePocket > Delete App
+  - Reinstall to verify free tier experience
 - [ ] Cloud sync uploads pages (premium only)
 - [ ] Restore purchases works
 - [ ] Downloads and offline reading work
