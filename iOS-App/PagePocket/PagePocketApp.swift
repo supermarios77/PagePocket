@@ -14,9 +14,29 @@ struct PagePocketApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
+            ContentView()
                 .modelContainer(appEnvironment.modelContainer)
                 .environmentObject(appEnvironment)
+        }
+    }
+}
+
+struct ContentView: View {
+    @EnvironmentObject private var appEnvironment: AppEnvironment
+    @State private var showOnboarding = !OnboardingViewModel.hasCompletedOnboarding
+    @State private var onboardingViewModel: OnboardingViewModel?
+
+    var body: some View {
+        if showOnboarding {
+            OnboardingView(viewModel: onboardingViewModel ?? OnboardingViewModel())
+                .onAppear {
+                    onboardingViewModel = OnboardingViewModel()
+                    onboardingViewModel?.onComplete = {
+                        showOnboarding = false
+                    }
+                }
+        } else {
+            RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
         }
     }
 }

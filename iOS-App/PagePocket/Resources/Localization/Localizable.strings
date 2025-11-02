@@ -120,3 +120,14 @@
 "settings.action.clearCache.success" = "Cache cleared successfully";
 "settings.action.clearCache.failed" = "Failed to clear cache";
 "settings.action.cancel" = "Cancel";
+
+/* MARK: - Onboarding */
+"onboarding.welcome.title" = "Welcome to PagePocket";
+"onboarding.welcome.description" = "Your personal offline reading companion. Save web pages and read them anytime, anywhere.";
+"onboarding.feature.offline.title" = "Read Offline";
+"onboarding.feature.offline.description" = "Download articles to read without an internet connection.";
+"onboarding.feature.sync.title" = "Smart Sync";
+"onboarding.feature.sync.description" = "Keep your reading list organized and in sync across devices.";
+"onboarding.feature.organize.title" = "Stay Organized";
+"onboarding.feature.organize.description" = "Categorize and track your reading progress.";
+"onboarding.getStarted" = "Get Started";
