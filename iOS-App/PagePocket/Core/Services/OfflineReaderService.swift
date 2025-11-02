@@ -12,6 +12,19 @@ extension Notification.Name {
     static let offlineReaderPageUpdated = Notification.Name("OfflineReaderPageUpdatedNotification")
 }
 
+enum OfflineReaderError: Error, LocalizedError {
+    case contentTooLarge(size: Int, maxSize: Int)
+    
+    var errorDescription: String? {
+        switch self {
+        case .contentTooLarge(let size, let maxSize):
+            let sizeMB = size / (1024 * 1024)
+            let maxMB = maxSize / (1024 * 1024)
+            return "Content too large (\(sizeMB)MB). Maximum size is \(maxMB)MB."
+        }
+    }
+}
+
 protocol OfflineReaderService {
     func savePage(from url: URL) async throws -> SavedPage
     func deletePage(_ pageID: UUID) async throws
@@ -31,6 +44,13 @@ struct DefaultOfflineReaderService: OfflineReaderService {
 
     func savePage(from url: URL) async throws -> SavedPage {
         let data = try await networkClient.fetchData(from: url)
+        
+        // Validate data size to prevent memory issues (50MB limit)
+        let maxSize = 50 * 1024 * 1024 // 50MB
+        guard data.count <= maxSize else {
+            throw OfflineReaderError.contentTooLarge(size: data.count, maxSize: maxSize)
+        }
+        
         let html = decodeHTML(from: data) ?? Self.placeholderHTML(for: url)
         let sanitizedHTML = sanitizeHTML(html, baseURL: url)
         let title = extractHTMLTitle(from: sanitizedHTML) ?? deriveFallbackTitle(from: url)

@@ -180,12 +180,21 @@ final class BrowserViewModel: ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return nil }
 
+        // Validate and normalize URL
         if let url = URL(string: trimmed), url.scheme != nil {
+            // Additional validation: only allow http/https schemes
+            guard ["http", "https"].contains(url.scheme?.lowercased()) else {
+                return nil
+            }
             return url
         }
 
         let prefixed = "https://" + trimmed
-        return URL(string: prefixed)
+        if let url = URL(string: prefixed) {
+            return url
+        }
+        
+        return nil
     }
 
     deinit {

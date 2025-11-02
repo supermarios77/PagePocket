@@ -17,8 +17,18 @@ enum NetworkClientError: Error {
 struct URLSessionNetworkClient: NetworkClient {
     private let session: URLSession
 
-    init(session: URLSession = .shared) {
-        self.session = session
+    init(session: URLSession? = nil) {
+        if let session = session {
+            self.session = session
+        } else {
+            // Configure URLSession with production-ready settings
+            let configuration = URLSessionConfiguration.default
+            configuration.timeoutIntervalForRequest = 30.0
+            configuration.timeoutIntervalForResource = 60.0
+            configuration.waitsForConnectivity = true
+            configuration.httpMaximumConnectionsPerHost = 3
+            self.session = URLSession(configuration: configuration)
+        }
     }
 
     func fetchData(from url: URL) async throws -> Data {

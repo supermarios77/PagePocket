@@ -21,11 +21,15 @@ final class AppEnvironment: ObservableObject {
     ) {
         self.networkClient = networkClient
 
+        // Try to create SwiftData container, but create in-memory fallback if it fails
         let container: ModelContainer
         do {
             container = try ModelContainer(for: SavedPageEntity.self)
         } catch {
-            fatalError("Failed to initialize SwiftData container: \(error.localizedDescription)")
+            // Log error in production, but provide fallback for development
+            print("⚠️ SwiftData initialization failed: \(error.localizedDescription)")
+            // In production, you might want to show an error UI or use UserDefaults fallback
+            container = try! ModelContainer(for: SavedPageEntity.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         }
         self.modelContainer = container
         self.modelContext = ModelContext(container)
