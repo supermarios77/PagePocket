@@ -1,6 +1,7 @@
 import Combine
 import Foundation
 import SwiftUI
+import WebKit
 
 @MainActor
 final class SettingsViewModel: ObservableObject {
@@ -45,16 +46,19 @@ final class SettingsViewModel: ObservableObject {
     }
 
     func clearCache() async {
-        // For now, this is just a placeholder
-        // In a production app, this would clear any cached data
-        try? await Task.sleep(nanoseconds: 500_000_000) // Simulate async work
-        
-        // In a real implementation, you would:
-        // 1. Clear WKWebView cache
-        // 2. Clear any image caches
-        // 3. Clear any other cached data
-        
-        cacheFeedback = CacheFeedback(kind: .success)
+        do {
+            // Clear WKWebView cache
+            let dataStore = WKWebsiteDataStore.default()
+            let types = WKWebsiteDataStore.allWebsiteDataTypes()
+            try await dataStore.removeData(ofTypes: types, modifiedSince: Date(timeIntervalSince1970: 0))
+            
+            // Clear URLCache
+            URLCache.shared.removeAllCachedResponses()
+            
+            cacheFeedback = CacheFeedback(kind: .success)
+        } catch {
+            cacheFeedback = CacheFeedback(kind: .failure)
+        }
     }
 }
 

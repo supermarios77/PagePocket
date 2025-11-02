@@ -1,9 +1,12 @@
 import Combine
 import Foundation
+import OSLog
 import SwiftData
 
 @MainActor
 final class AppEnvironment: ObservableObject {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PagePocket", category: "AppEnvironment")
+    
     enum ThemePreference: String, CaseIterable {
         case system
         case light
@@ -43,7 +46,7 @@ final class AppEnvironment: ObservableObject {
             container = try ModelContainer(for: SavedPageEntity.self)
         } catch {
             // Log error in production, but provide fallback for development
-            print("⚠️ SwiftData initialization failed: \(error.localizedDescription)")
+            Self.logger.error("SwiftData initialization failed: \(error.localizedDescription)")
             // In production, you might want to show an error UI or use UserDefaults fallback
             container = try! ModelContainer(for: SavedPageEntity.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
         }

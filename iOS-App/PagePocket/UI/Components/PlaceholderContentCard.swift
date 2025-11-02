@@ -33,7 +33,7 @@ struct PlaceholderCard: View {
             Spacer(minLength: 0)
 
             HStack(spacing: 8) {
-                Text("placeholder.action.learnMore")
+                Text(String(localized: "placeholder.action.learnMore"))
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.white)
 
@@ -112,8 +112,8 @@ struct PlaceholderListRow: View {
 
 #Preview("Card") {
     PlaceholderCard(
-        title: String(localized: "preview.card.title"),
-        description: String(localized: "preview.card.description"),
+        title: "Capture for offline",
+        description: "Download a page and keep it in sync",
         systemImageName: "arrow.down.doc"
     )
     .padding()
@@ -121,9 +121,9 @@ struct PlaceholderListRow: View {
 
 #Preview("Row") {
     PlaceholderListRow(
-        title: String(localized: "preview.row.title"),
-        subtitle: String(localized: "preview.row.subtitle"),
-        status: String(localized: "preview.row.status"),
+        title: "Sample Article",
+        subtitle: "example.com • 5 min read",
+        status: "New",
         systemImageName: "doc.text.magnifyingglass"
     )
     .padding()

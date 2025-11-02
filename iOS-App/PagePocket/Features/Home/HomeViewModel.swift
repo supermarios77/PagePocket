@@ -24,7 +24,7 @@ final class HomeViewModel: ObservableObject {
             ),
             QuickAction(
                 title: String(localized: "downloads.navigation.title"),
-                subtitle: String(localized: "downloads.navigation.subtitle", defaultValue: "View your downloads"),
+                subtitle: String(localized: "downloads.navigation.subtitle"),
                 systemImageName: "arrow.down.circle",
                 action: .navigateToDownloads
             )
