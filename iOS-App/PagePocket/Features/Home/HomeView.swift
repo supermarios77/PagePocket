@@ -178,10 +178,11 @@ struct HomeView: View {
 }
 
 #Preview {
+    @Previewable @State var theme = AppEnvironment.ThemePreference.system
     HomeView(
         viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()),
         selectedTab: .constant(.home),
-        makeSettingsViewModel: { SettingsViewModel() }
+        makeSettingsViewModel: { SettingsViewModel(theme: $theme) }
     )
 }
 

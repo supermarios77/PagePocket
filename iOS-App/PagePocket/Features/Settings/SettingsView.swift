@@ -12,7 +12,7 @@ struct SettingsView: View {
     var body: some View {
         List {
             Section {
-                ThemePicker(selection: $viewModel.theme)
+                ThemePicker(selection: viewModel.theme)
             } header: {
                 Text(String(localized: "settings.section.general.title"))
             }
