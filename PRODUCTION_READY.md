@@ -36,9 +36,9 @@ PagePocket is now fully production-ready with:
 
 ### 1. App Store Connect Setup
 Create the following subscription products:
-- **com.pagepocket.subscription.weekly** - $2.99/week
-- **com.pagepocket.subscription.monthly** - $4.99/month
-- **com.pagepocket.subscription.yearly** - $39.99/year
+- **com.pagepocket.premium.weekly** - $2.99/week
+- **com.pagepocket.premium.monthly** - $4.99/month
+- **com.pagepocket.premium.yearly** - $39.99/year
 
 ### 2. StoreKit Configuration
 Add `.storekit` configuration file to test purchases in development:
