@@ -16,6 +16,7 @@ final class DownloadsViewModel: ObservableObject {
         let systemImageName: String
         let progress: Double?
         let failureReason: String?
+        let savedPageID: UUID?
 
         init(record: DownloadRecord) {
             id = record.id
@@ -24,6 +25,7 @@ final class DownloadsViewModel: ObservableObject {
             status = record.status.localizedDescription
             systemImageName = record.status.systemImageName
             progress = record.progressValue
+            savedPageID = record.savedPageID
             if case let .failed(reason) = record.status {
                 failureReason = reason
             } else {
@@ -37,11 +39,13 @@ final class DownloadsViewModel: ObservableObject {
     @Published private(set) var isLoading = false
 
     private let downloadService: DownloadService
+    private let offlineReaderService: OfflineReaderService
     private var hasLoaded = false
     private var updatesTask: Task<Void, Never>?
 
-    init(downloadService: DownloadService) {
+    init(downloadService: DownloadService, offlineReaderService: OfflineReaderService) {
         self.downloadService = downloadService
+        self.offlineReaderService = offlineReaderService
         updatesTask = Task { [weak self] in
             guard let self else { return }
             for await _ in downloadService.updates() {
@@ -64,6 +68,10 @@ final class DownloadsViewModel: ObservableObject {
 
     func cancelDownload(id: UUID) async {
         await downloadService.cancelDownload(id: id)
+    }
+
+    func makeReaderViewModel(for pageID: UUID) -> OfflineReaderViewModel {
+        OfflineReaderViewModel(pageID: pageID, offlineReaderService: offlineReaderService)
     }
 
     private func loadSnapshots() async {

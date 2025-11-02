@@ -100,7 +100,8 @@ actor DefaultDownloadService: DownloadService {
             title: record.title,
             detail: record.detail,
             createdAt: record.createdAt,
-            status: status
+            status: status,
+            savedPageID: record.savedPageID
         )
         notifyObservers()
     }
@@ -112,7 +113,8 @@ actor DefaultDownloadService: DownloadService {
             title: page.title,
             detail: page.source,
             createdAt: Date(),
-            status: .available
+            status: .available,
+            savedPageID: page.id
         )
         notifyObservers()
     }

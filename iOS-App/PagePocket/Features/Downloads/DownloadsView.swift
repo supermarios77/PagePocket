@@ -36,8 +36,18 @@ struct DownloadsView: View {
                     )
                 ) {
                     ForEach(viewModel.completedDownloads) { item in
-                        DownloadRowView(row: item)
-                        .accessibilityIdentifier("downloads-completed-row-\(item.id.uuidString)")
+                        if let savedPageID = item.savedPageID {
+                            NavigationLink {
+                                OfflineReaderView(viewModel: viewModel.makeReaderViewModel(for: savedPageID))
+                            } label: {
+                                DownloadRowView(row: item)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityIdentifier("downloads-completed-row-\(item.id.uuidString)")
+                        } else {
+                            DownloadRowView(row: item)
+                                .accessibilityIdentifier("downloads-completed-row-\(item.id.uuidString)")
+                        }
                     }
                 }
             }
@@ -58,7 +68,7 @@ struct DownloadsView: View {
 }
 
 #Preview {
-    DownloadsView(viewModel: DownloadsViewModel(downloadService: PreviewDownloadsService()))
+    DownloadsView(viewModel: DownloadsViewModel(downloadService: PreviewDownloadsService(), offlineReaderService: StubOfflineReaderService()))
 }
 
 private struct DownloadRowView: View {

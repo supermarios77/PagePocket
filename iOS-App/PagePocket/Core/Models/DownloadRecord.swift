@@ -19,7 +19,7 @@ struct DownloadRecord: Identifiable, Hashable {
             case .archived:
                 String(localized: "downloads.completed.item.status.archived")
             case .failed:
-                String(localized: "downloads.completed.item.status.failed", defaultValue: "Failed")
+                String(localized: "downloads.completed.item.status.failed")
             }
         }
 
@@ -42,6 +42,7 @@ struct DownloadRecord: Identifiable, Hashable {
     let detail: String
     let createdAt: Date
     let status: Status
+    let savedPageID: UUID?
 
     var progressValue: Double? {
         if case let .inProgress(progress) = status {
@@ -55,13 +56,15 @@ struct DownloadRecord: Identifiable, Hashable {
         title: String,
         detail: String,
         createdAt: Date = Date(),
-        status: Status
+        status: Status,
+        savedPageID: UUID? = nil
     ) {
         self.id = id
         self.title = title
         self.detail = detail
         self.createdAt = createdAt
         self.status = status
+        self.savedPageID = savedPageID
     }
 }
 

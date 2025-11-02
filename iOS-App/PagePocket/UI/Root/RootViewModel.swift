@@ -20,7 +20,10 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeDownloadsViewModel() -> DownloadsViewModel {
-        DownloadsViewModel(downloadService: appEnvironment.downloadService)
+        DownloadsViewModel(
+            downloadService: appEnvironment.downloadService,
+            offlineReaderService: appEnvironment.offlineReaderService
+        )
     }
 }
 
