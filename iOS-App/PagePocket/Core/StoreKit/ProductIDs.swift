@@ -7,9 +7,9 @@ import Foundation
 
 /// App Store Connect product identifiers for in-app purchases
 enum ProductID: String, CaseIterable, Identifiable, Codable {
-    case weekly = "com.pagepocket.subscription.weekly"
-    case monthly = "com.pagepocket.subscription.monthly"
-    case yearly = "com.pagepocket.subscription.yearly"
+    case weekly = "com.pagepocket.premium.weekly"
+    case monthly = "com.pagepocket.premium.monthly"
+    case yearly = "com.pagepocket.premium.yearly"
     
     var id: String { rawValue }
     
