@@ -59,51 +59,6 @@ struct BrowserView: View {
                     }
                 }
 
-                SectionHeader(
-                    title: String(localized: "browser.suggestedActions.title"),
-                    subtitle: String(localized: "browser.suggestedActions.subtitle")
-                )
-
-                LazyVGrid(columns: gridColumns, spacing: 16) {
-                    ForEach(viewModel.suggestedActions) { action in
-                        VStack(alignment: .leading, spacing: 12) {
-                            Image(systemName: action.systemImageName)
-                                .font(.title2)
-                                .foregroundStyle(Color.accentColor)
-                                .padding(12)
-                                .background(Color.accentColor.opacity(0.12))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(action.title)
-                                    .font(.headline)
-
-                                Text(action.subtitle)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                        }
-                        .padding(20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .strokeBorder(Color.accentColor.opacity(0.15), lineWidth: 1)
-                        )
-                    }
-                }
-
-                VStack(alignment: .leading, spacing: 16) {
-                    SectionHeader(
-                        title: String(localized: "browser.offlinePreview.title"),
-                        subtitle: String(localized: "browser.offlinePreview.subtitle")
-                    )
-
-                    PlaceholderCard(
-                        title: viewModel.offlinePreview.title,
-                        description: viewModel.offlinePreview.description,
-                        systemImageName: viewModel.offlinePreview.systemImageName
-                    )
-                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
@@ -197,7 +152,6 @@ struct BrowserView: View {
         }
     }
 
-    private let gridColumns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 2)
 }
 
 #Preview {
@@ -206,7 +160,6 @@ struct BrowserView: View {
     BrowserView(
         viewModel: BrowserViewModel(
             offlineReaderService: previewOfflineService,
-            browsingExperienceService: InMemoryBrowsingExperienceService(),
             downloadService: previewDownloadService
         )
     )

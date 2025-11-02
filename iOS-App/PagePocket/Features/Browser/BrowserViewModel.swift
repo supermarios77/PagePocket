@@ -35,26 +35,6 @@ final class BrowserViewModel: ObservableObject {
         }
     }
 
-    struct SuggestedActionViewData: Identifiable, Equatable {
-        let id: UUID
-        let title: String
-        let subtitle: String
-        let systemImageName: String
-
-        init(action: SuggestedBrowserAction) {
-            id = action.id
-            title = action.title
-            subtitle = action.detail
-            systemImageName = action.systemImageName
-        }
-    }
-
-    struct OfflinePreviewCard: Equatable {
-        let title: String
-        let description: String
-        let systemImageName: String
-    }
-
     struct CaptureFeedback: Identifiable, Equatable {
         enum Kind: Equatable {
             case success(message: String)
@@ -67,29 +47,20 @@ final class BrowserViewModel: ObservableObject {
 
     @Published var query: String = ""
     @Published private(set) var recentSessions: [RecentSessionViewData] = []
-    @Published private(set) var suggestedActions: [SuggestedActionViewData] = []
-    @Published private(set) var offlinePreview: OfflinePreviewCard = .init(
-        title: String(localized: "browser.offlinePreview.card.title"),
-        description: String(localized: "browser.offlinePreview.card.subtitle"),
-        systemImageName: "arrow.down.doc"
-    )
     @Published private(set) var isLoading = false
     @Published private(set) var isCapturing = false
     @Published var captureFeedback: CaptureFeedback?
 
     private let offlineReaderService: OfflineReaderService
-    private let browsingExperienceService: BrowsingExperienceService
     private let downloadService: DownloadService
     private var hasLoaded = false
     private var notificationTasks: [Task<Void, Never>] = []
 
     init(
         offlineReaderService: OfflineReaderService,
-        browsingExperienceService: BrowsingExperienceService,
         downloadService: DownloadService
     ) {
         self.offlineReaderService = offlineReaderService
-        self.browsingExperienceService = browsingExperienceService
         self.downloadService = downloadService
 
         let notificationNames: [Notification.Name] = [
@@ -118,17 +89,10 @@ final class BrowserViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        async let pagesTask = offlineReaderService.listSavedPages()
-        async let actionsTask = browsingExperienceService.loadSuggestedActions()
-
         do {
-            let savedPages = try await pagesTask
-            let suggested = await actionsTask
+            let savedPages = try await offlineReaderService.listSavedPages()
             recentSessions = savedPages.prefix(5).map(RecentSessionViewData.init)
-            suggestedActions = suggested.map(SuggestedActionViewData.init)
         } catch {
-            let suggested = await actionsTask
-            suggestedActions = suggested.map(SuggestedActionViewData.init)
             captureFeedback = CaptureFeedback(kind: .failure(message: error.localizedDescription))
         }
     }

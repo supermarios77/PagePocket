@@ -51,34 +51,8 @@ final class HomeViewModel: ObservableObject {
         }
     }
 
-    struct OfflineTip: Identifiable, Equatable {
-        let id = UUID()
-        let title: String
-        let subtitle: String
-        let systemImageName: String
-
-        static let defaults: [OfflineTip] = [
-            OfflineTip(
-                title: String(localized: "home.offlineTips.item1.title"),
-                subtitle: String(localized: "home.offlineTips.item1.subtitle"),
-                systemImageName: "wifi.slash"
-            ),
-            OfflineTip(
-                title: String(localized: "home.offlineTips.item2.title"),
-                subtitle: String(localized: "home.offlineTips.item2.subtitle"),
-                systemImageName: "square.and.arrow.down.on.square"
-            ),
-            OfflineTip(
-                title: String(localized: "home.offlineTips.item3.title"),
-                subtitle: String(localized: "home.offlineTips.item3.subtitle"),
-                systemImageName: "bell.badge"
-            )
-        ]
-    }
-
     @Published private(set) var quickActions: [QuickAction]
     @Published private(set) var readingList: [ReadingListItem] = []
-    @Published private(set) var offlineTips: [OfflineTip]
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
 
@@ -89,7 +63,6 @@ final class HomeViewModel: ObservableObject {
     init(offlineReaderService: OfflineReaderService) {
         self.offlineReaderService = offlineReaderService
         self.quickActions = QuickAction.defaults
-        self.offlineTips = OfflineTip.defaults
 
         let notificationNames: [Notification.Name] = [
             .offlineReaderPageSaved,

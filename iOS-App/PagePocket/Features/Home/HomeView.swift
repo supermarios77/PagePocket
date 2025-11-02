@@ -76,41 +76,6 @@ struct HomeView: View {
                         .fill(Color(.secondarySystemBackground))
                 )
 
-                VStack(alignment: .leading, spacing: 16) {
-                    SectionHeader(
-                        title: String(localized: "home.offlineTips.title"),
-                        subtitle: String(localized: "home.offlineTips.subtitle")
-                    )
-
-                    VStack(alignment: .leading, spacing: 12) {
-                        ForEach(viewModel.offlineTips) { tip in
-                            HStack(alignment: .top, spacing: 12) {
-                                Image(systemName: tip.systemImageName)
-                                    .font(.headline)
-                                    .foregroundStyle(Color.accentColor)
-                                    .padding(8)
-                                    .background(Color.accentColor.opacity(0.12))
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text(tip.title)
-                                        .font(.subheadline.bold())
-                                        .foregroundStyle(.primary)
-
-                                    Text(tip.subtitle)
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .padding(20)
-                    .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .strokeBorder(Color.accentColor.opacity(0.2), lineWidth: 1)
-                    )
-                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
