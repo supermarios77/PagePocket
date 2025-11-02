@@ -50,6 +50,7 @@ final class BrowserViewModel: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var isCapturing = false
     @Published var captureFeedback: CaptureFeedback?
+    @Published var showPaywall = false
 
     private let offlineReaderService: OfflineReaderService
     private let downloadService: DownloadService
@@ -124,7 +125,10 @@ final class BrowserViewModel: ObservableObject {
             )
             query = ""
         } catch {
-            if (error as NSError).code == NSUserCancelledError {
+            if let readerError = error as? OfflineReaderError,
+               case .freeLimitReached = readerError {
+                showPaywall = true
+            } else if (error as NSError).code == NSUserCancelledError {
                 captureFeedback = CaptureFeedback(
                     kind: .failure(message: String(localized: "downloads.actions.cancelled"))
                 )

@@ -8,9 +8,11 @@ import SwiftUI
 struct BrowserView: View {
     @StateObject private var viewModel: BrowserViewModel
     @State private var presentedFeedback: BrowserViewModel.CaptureFeedback?
+    let makePaywallViewModel: () -> PaywallViewModel
 
-    init(viewModel: BrowserViewModel) {
+    init(viewModel: BrowserViewModel, makePaywallViewModel: @escaping () -> PaywallViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.makePaywallViewModel = makePaywallViewModel
     }
 
     var body: some View {
@@ -114,6 +116,9 @@ struct BrowserView: View {
                 )
             }
         }
+        .sheet(isPresented: $viewModel.showPaywall) {
+            PaywallView(viewModel: makePaywallViewModel())
+        }
     }
 
     private var searchField: some View {
@@ -161,7 +166,8 @@ struct BrowserView: View {
         viewModel: BrowserViewModel(
             offlineReaderService: previewOfflineService,
             downloadService: previewDownloadService
-        )
+        ),
+        makePaywallViewModel: { PaywallViewModel(purchaseService: MockPurchaseService()) }
     )
 }
 

@@ -31,7 +31,10 @@ struct RootView: View {
             .tag(Tab.home)
 
             NavigationStack {
-                BrowserView(viewModel: viewModel.makeBrowserViewModel())
+                BrowserView(
+                    viewModel: viewModel.makeBrowserViewModel(),
+                    makePaywallViewModel: viewModel.makePaywallViewModel
+                )
             }
             .tabItem {
                 Label(String(localized: "browser.tab.title"), systemImage: "safari")

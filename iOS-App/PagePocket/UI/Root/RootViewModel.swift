@@ -42,5 +42,9 @@ final class RootViewModel: ObservableObject {
     func makeSettingsViewModel() -> SettingsViewModel {
         SettingsViewModel(theme: makeThemeBinding())
     }
+    
+    func makePaywallViewModel() -> PaywallViewModel {
+        PaywallViewModel(purchaseService: appEnvironment.purchaseService)
+    }
 }
 
