@@ -28,18 +28,23 @@ struct ContentView: View {
 
     var body: some View {
         if showOnboarding {
-            OnboardingView(
-                viewModel: onboardingViewModel ?? OnboardingViewModel(),
-                offlineReaderService: appEnvironment.offlineReaderService
-            )
-            .onAppear {
-                onboardingViewModel = OnboardingViewModel()
-                onboardingViewModel?.onComplete = {
-                    showOnboarding = false
-                }
+            if let viewModel = onboardingViewModel {
+                OnboardingView(
+                    viewModel: viewModel,
+                    offlineReaderService: appEnvironment.offlineReaderService
+                )
             }
         } else {
             RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
+        }
+    }
+    .onAppear {
+        if onboardingViewModel == nil {
+            let viewModel = OnboardingViewModel()
+            viewModel.onComplete = {
+                showOnboarding = false
+            }
+            onboardingViewModel = viewModel
         }
     }
 }
