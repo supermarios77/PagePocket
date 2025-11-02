@@ -2,10 +2,10 @@ import SwiftUI
 
 struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
-    @Binding var selectedTab: RootView.Tab?
+    @Binding var selectedTab: RootView.Tab
     @State private var presentedError: String?
 
-    init(viewModel: HomeViewModel, selectedTab: Binding<RootView.Tab?>) {
+    init(viewModel: HomeViewModel, selectedTab: Binding<RootView.Tab>) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _selectedTab = selectedTab
     }
