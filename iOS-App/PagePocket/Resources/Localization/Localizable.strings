@@ -132,3 +132,26 @@
 "onboarding.feature.organized.description" = "Keep all your reading in one place, tagged and ready when you need it.";
 "onboarding.getStarted" = "Get Started";
 "onboarding.next" = "Next";
+
+/* MARK: - Premium / Paywall */
+"premium.title" = "Unlock Premium";
+"premium.subtitle" = "Get unlimited offline reading with cloud sync";
+"premium.feature.unlimited.title" = "Unlimited Pages";
+"premium.feature.unlimited.description" = "Save as many pages as you want, no limits";
+"premium.feature.sync.title" = "Cloud Sync";
+"premium.feature.sync.description" = "Access your library on all your devices";
+"premium.feature.adfree.title" = "Ad-Free Experience";
+"premium.feature.adfree.description" = "Enjoy reading without distractions";
+"premium.cta.button" = "Continue";
+"premium.cta.button.loading" = "Processing...";
+"premium.restore" = "Restore Purchases";
+"premium.terms" = "Terms of Service";
+"premium.privacy" = "Privacy Policy";
+"premium.success.title" = "Welcome to Premium!";
+"premium.success.message" = "You now have access to all premium features.";
+"premium.error.title" = "Purchase Failed";
+"premium.error.message" = "Something went wrong. Please try again.";
+"premium.freeLimit.title" = "You've hit the free limit";
+"premium.freeLimit.message" = "Free users can save up to 2 pages. Upgrade to Premium for unlimited storage and cloud sync.";
+"premium.freeLimit.upgrade" = "Upgrade to Premium";
+"premium.freeLimit.dismiss" = "Not Now";

@@ -14,6 +14,7 @@ extension Notification.Name {
 
 enum OfflineReaderError: Error, LocalizedError {
     case contentTooLarge(size: Int, maxSize: Int)
+    case freeLimitReached
     
     var errorDescription: String? {
         switch self {
@@ -21,6 +22,8 @@ enum OfflineReaderError: Error, LocalizedError {
             let sizeMB = size / (1024 * 1024)
             let maxMB = maxSize / (1024 * 1024)
             return "Content too large (\(sizeMB)MB). Maximum size is \(maxMB)MB."
+        case .freeLimitReached:
+            return String(localized: "premium.freeLimit.message")
         }
     }
 }

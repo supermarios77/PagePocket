@@ -57,9 +57,22 @@ final class AppEnvironment: ObservableObject {
 
         let activeStorageProvider = storageProvider ?? SwiftDataStorageProvider(context: modelContext)
         self.storageProvider = activeStorageProvider
+        
+        // Use MockPurchaseService for development, StoreKit2PurchaseService for production
+        #if DEBUG
+        self.purchaseService = purchaseService ?? MockPurchaseService()
+        #else
+        self.purchaseService = purchaseService ?? StoreKit2PurchaseService()
+        #endif
 
-        self.offlineReaderService = offlineReaderService
+        let baseOfflineReaderService = offlineReaderService
             ?? DefaultOfflineReaderService(networkClient: networkClient, storageProvider: activeStorageProvider)
+        
+        // Wrap with premium checks
+        self.offlineReaderService = PremiumOfflineReaderService(
+            wrapping: baseOfflineReaderService,
+            purchaseService: self.purchaseService
+        )
 
         self.downloadService = downloadService
             ?? DefaultDownloadService(
@@ -68,13 +81,6 @@ final class AppEnvironment: ObservableObject {
 
         self.browsingExperienceService = browsingExperienceService
             ?? InMemoryBrowsingExperienceService()
-        
-        // Use MockPurchaseService for development, StoreKit2PurchaseService for production
-        #if DEBUG
-        self.purchaseService = purchaseService ?? MockPurchaseService()
-        #else
-        self.purchaseService = purchaseService ?? StoreKit2PurchaseService()
-        #endif
     }
 }
 
