@@ -83,6 +83,16 @@ final class HomeViewModel: ObservableObject {
                 }
                 .store(in: &cancellables)
         }
+        
+        // Subscribe to entitlement updates
+        Task { [weak self] in
+            guard let self else { return }
+            for await _ in purchaseService.entitlementUpdates() {
+                await MainActor.run {
+                    self.isPremium = self.purchaseService.currentEntitlements.isPremium
+                }
+            }
+        }
     }
 
     func loadContentIfNeeded() async {

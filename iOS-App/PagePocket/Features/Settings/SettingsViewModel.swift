@@ -48,6 +48,16 @@ final class SettingsViewModel: ObservableObject {
         self.autoDownload = UserDefaults.standard.bool(forKey: "autoDownload")
         self.downloadOverWiFi = UserDefaults.standard.bool(forKey: "downloadOverWiFi")
         self.isPremium = purchaseService.currentEntitlements.isPremium
+        
+        // Subscribe to entitlement updates
+        Task { [weak self] in
+            guard let self else { return }
+            for await _ in purchaseService.entitlementUpdates() {
+                await MainActor.run {
+                    self.isPremium = self.purchaseService.currentEntitlements.isPremium
+                }
+            }
+        }
     }
     
     func refreshPremiumStatus() {
