@@ -27,6 +27,7 @@ final class AppEnvironment: ObservableObject {
     let downloadService: DownloadService
     let browsingExperienceService: BrowsingExperienceService
     let purchaseService: PurchaseService
+    let cloudSyncService: CloudSyncService
 
     init(
         networkClient: NetworkClient = URLSessionNetworkClient(),
@@ -34,7 +35,8 @@ final class AppEnvironment: ObservableObject {
         offlineReaderService: OfflineReaderService? = nil,
         downloadService: DownloadService? = nil,
         browsingExperienceService: BrowsingExperienceService? = nil,
-        purchaseService: PurchaseService? = nil
+        purchaseService: PurchaseService? = nil,
+        cloudSyncService: CloudSyncService? = nil
     ) {
         // Load saved theme preference
         let savedTheme = UserDefaults.standard.string(forKey: "appTheme") ?? "system"
@@ -65,13 +67,27 @@ final class AppEnvironment: ObservableObject {
         self.purchaseService = purchaseService ?? StoreKit2PurchaseService()
         #endif
 
+        // CloudKit sync service - use mock in DEBUG, real service in production
+        #if DEBUG
+        self.cloudSyncService = cloudSyncService ?? MockCloudSyncService()
+        #else
+        self.cloudSyncService = cloudSyncService ?? CloudKitSyncService()
+        #endif
+        
         let baseOfflineReaderService = offlineReaderService
             ?? DefaultOfflineReaderService(networkClient: networkClient, storageProvider: activeStorageProvider)
         
         // Wrap with premium checks
-        self.offlineReaderService = PremiumOfflineReaderService(
+        let premiumWrappedService = PremiumOfflineReaderService(
             wrapping: baseOfflineReaderService,
             purchaseService: self.purchaseService
+        )
+        
+        // Wrap with CloudKit sync for premium users
+        self.offlineReaderService = CloudSyncOfflineReaderService(
+            wrapping: premiumWrappedService,
+            purchaseService: self.purchaseService,
+            cloudSyncService: self.cloudSyncService
         )
 
         self.downloadService = downloadService
