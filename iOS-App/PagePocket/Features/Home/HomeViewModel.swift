@@ -55,14 +55,19 @@ final class HomeViewModel: ObservableObject {
     @Published private(set) var readingList: [ReadingListItem] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var isPremium = false
+    @Published var showPaywall = false
 
     private let offlineReaderService: OfflineReaderService
+    private let purchaseService: PurchaseService
     private var hasLoadedContent = false
     private var cancellables: Set<AnyCancellable> = []
 
-    init(offlineReaderService: OfflineReaderService) {
+    init(offlineReaderService: OfflineReaderService, purchaseService: PurchaseService) {
         self.offlineReaderService = offlineReaderService
+        self.purchaseService = purchaseService
         self.quickActions = QuickAction.defaults
+        self.isPremium = purchaseService.currentEntitlements.isPremium
 
         let notificationNames: [Notification.Name] = [
             .offlineReaderPageSaved,

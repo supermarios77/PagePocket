@@ -22,7 +22,7 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeHomeViewModel() -> HomeViewModel {
-        HomeViewModel(offlineReaderService: appEnvironment.offlineReaderService)
+        HomeViewModel(offlineReaderService: appEnvironment.offlineReaderService, purchaseService: appEnvironment.purchaseService)
     }
 
     func makeBrowserViewModel() -> BrowserViewModel {

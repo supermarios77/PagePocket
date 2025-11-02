@@ -5,21 +5,28 @@ struct HomeView: View {
     @Binding var selectedTab: RootView.Tab
     @State private var presentedError: String?
     let makeSettingsViewModel: () -> SettingsViewModel
+    let makePaywallViewModel: () -> PaywallViewModel
 
     init(
         viewModel: HomeViewModel,
         selectedTab: Binding<RootView.Tab>,
-        makeSettingsViewModel: @escaping () -> SettingsViewModel
+        makeSettingsViewModel: @escaping () -> SettingsViewModel,
+        makePaywallViewModel: @escaping () -> PaywallViewModel
     ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _selectedTab = selectedTab
         self.makeSettingsViewModel = makeSettingsViewModel
+        self.makePaywallViewModel = makePaywallViewModel
     }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 32) {
                 heroSection
+                
+                if !viewModel.isPremium {
+                    premiumCard
+                }
 
                 SectionHeader(
                     title: String(localized: "home.quickActions.title"),
@@ -123,6 +130,9 @@ struct HomeView: View {
         } message: {
             Text(presentedError ?? "")
         }
+        .sheet(isPresented: $viewModel.showPaywall) {
+            PaywallView(viewModel: makePaywallViewModel())
+        }
     }
 
     private var heroSection: some View {
@@ -167,6 +177,46 @@ struct HomeView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private var premiumCard: some View {
+        Button(action: {
+            viewModel.showPaywall = true
+        }) {
+            HStack(spacing: 16) {
+                Image(systemName: "crown.fill")
+                    .font(.title)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.orange, .yellow],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "premium.title"))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    
+                    Text(String(localized: "premium.subtitle"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                
+                Spacer()
+                
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color(.secondarySystemBackground))
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
     private func handleQuickAction(_ action: HomeViewModel.QuickAction) {
         switch action.action {
         case .navigateToBrowser:
@@ -180,9 +230,10 @@ struct HomeView: View {
 #Preview {
     @Previewable @State var theme = AppEnvironment.ThemePreference.system
     HomeView(
-        viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()),
+        viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService(), purchaseService: MockPurchaseService()),
         selectedTab: .constant(.home),
-        makeSettingsViewModel: { SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()) }
+        makeSettingsViewModel: { SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()) },
+        makePaywallViewModel: { PaywallViewModel(purchaseService: MockPurchaseService()) }
     )
 }
 

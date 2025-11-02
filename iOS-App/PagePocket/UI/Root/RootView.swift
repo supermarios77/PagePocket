@@ -22,7 +22,8 @@ struct RootView: View {
                 HomeView(
                     viewModel: viewModel.makeHomeViewModel(),
                     selectedTab: $selectedTab,
-                    makeSettingsViewModel: viewModel.makeSettingsViewModel
+                    makeSettingsViewModel: viewModel.makeSettingsViewModel,
+                    makePaywallViewModel: viewModel.makePaywallViewModel
                 )
             }
             .tabItem {
