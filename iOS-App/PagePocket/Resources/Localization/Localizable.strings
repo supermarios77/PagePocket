@@ -102,6 +102,11 @@
 
 /* MARK: - Settings */
 "settings.navigation.title" = "Settings";
+"settings.section.premium.title" = "Premium";
+"settings.section.premium.status" = "Status";
+"settings.section.premium.status.active" = "Active";
+"settings.section.premium.status.free" = "Free";
+"settings.section.premium.upgrade" = "Upgrade to Premium";
 "settings.section.general.title" = "General";
 "settings.section.general.appTheme" = "App Theme";
 "settings.section.general.appTheme.system" = "System";

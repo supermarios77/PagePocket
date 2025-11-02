@@ -11,6 +11,8 @@ struct SettingsView: View {
 
     var body: some View {
         List {
+            premiumSection
+            
             Section {
                 ThemePicker(selection: viewModel.theme)
             } header: {
@@ -78,6 +80,42 @@ struct SettingsView: View {
             )
         }
     }
+    
+    private var premiumSection: some View {
+        Section {
+            HStack {
+                Image(systemName: viewModel.isPremium ? "crown.fill" : "crown")
+                    .foregroundStyle(viewModel.isPremium ? Color.orange : Color.gray)
+                    .font(.title3)
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "settings.section.premium.status"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    
+                    Text(viewModel.isPremium 
+                        ? String(localized: "settings.section.premium.status.active")
+                        : String(localized: "settings.section.premium.status.free"))
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                }
+                
+                Spacer()
+                
+                if !viewModel.isPremium {
+                    Text("Upgrade")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(AppTheme.primaryGradient)
+                        .clipShape(Capsule())
+                }
+            }
+        } header: {
+            Text(String(localized: "settings.section.premium.title"))
+        }
+    }
 }
 
 private struct ThemePicker: View {
@@ -96,7 +134,7 @@ private struct ThemePicker: View {
 #Preview {
     @Previewable @State var theme = AppEnvironment.ThemePreference.system
     NavigationStack {
-        SettingsView(viewModel: SettingsViewModel(theme: $theme))
+        SettingsView(viewModel: SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()))
     }
 }
 

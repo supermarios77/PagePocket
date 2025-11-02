@@ -182,7 +182,7 @@ struct HomeView: View {
     HomeView(
         viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()),
         selectedTab: .constant(.home),
-        makeSettingsViewModel: { SettingsViewModel(theme: $theme) }
+        makeSettingsViewModel: { SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()) }
     )
 }
 

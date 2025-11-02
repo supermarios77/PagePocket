@@ -16,7 +16,10 @@ final class SettingsViewModel: ObservableObject {
     }
 
     var theme: Binding<AppEnvironment.ThemePreference>
+    let purchaseService: PurchaseService
 
+    @Published private(set) var isPremium: Bool = false
+    
     @Published var autoDownload: Bool {
         didSet {
             UserDefaults.standard.set(autoDownload, forKey: "autoDownload")
@@ -39,10 +42,16 @@ final class SettingsViewModel: ObservableObject {
         URL(string: "https://github.com/supermarios77/PagePocket/issues")!
     }
 
-    init(theme: Binding<AppEnvironment.ThemePreference>) {
+    init(theme: Binding<AppEnvironment.ThemePreference>, purchaseService: PurchaseService) {
         self.theme = theme
+        self.purchaseService = purchaseService
         self.autoDownload = UserDefaults.standard.bool(forKey: "autoDownload")
         self.downloadOverWiFi = UserDefaults.standard.bool(forKey: "downloadOverWiFi")
+        self.isPremium = purchaseService.currentEntitlements.isPremium
+    }
+    
+    func refreshPremiumStatus() {
+        isPremium = purchaseService.currentEntitlements.isPremium
     }
 
     func clearCache() async {
