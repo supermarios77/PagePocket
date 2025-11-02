@@ -122,16 +122,13 @@
 "settings.action.cancel" = "Cancel";
 
 /* MARK: - Onboarding */
-"onboarding.welcome.title" = "Welcome to PagePocket";
-"onboarding.welcome.description" = "Your personal offline reading companion. Save web pages and read them anytime, anywhere.";
-"onboarding.howto.title" = "Try It Out";
-"onboarding.howto.description" = "Save your first page right now. Paste any URL below!";
-"onboarding.howto.placeholder" = "https://example.com/article";
-"onboarding.howto.action" = "Save for Offline";
-"onboarding.howto.skip" = "Skip for now";
-"onboarding.howto.success" = "Saved! Tap Get Started to view it.";
-"onboarding.howto.error" = "Couldn't save that URL. Try another one.";
-"onboarding.feature.organize.title" = "Your Reading Hub";
-"onboarding.feature.organize.description" = "All your saved pages in one place, always accessible offline.";
+"onboarding.congrats.title" = "Welcome!";
+"onboarding.congrats.description" = "You've just downloaded the best offline reading companion. Let's see what makes PagePocket special.";
+"onboarding.feature.offline.title" = "Read Anywhere";
+"onboarding.feature.offline.description" = "Save any web page and read it offline, whether you're on a plane or in the subway.";
+"onboarding.feature.fast.title" = "Lightning Fast";
+"onboarding.feature.fast.description" = "Pages load instantly from your device, no buffering or slow connections.";
+"onboarding.feature.organized.title" = "Stay Organized";
+"onboarding.feature.organized.description" = "Keep all your reading in one place, tagged and ready when you need it.";
 "onboarding.getStarted" = "Get Started";
 "onboarding.next" = "Next";
