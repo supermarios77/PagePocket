@@ -123,3 +123,8 @@
 "reader.loading" = "Loading offline content…";
 "reader.error.unavailable" = "We couldn't load this page offline.";
 "reader.toolbar.share" = "Share";
+"reader.toolbar.delete" = "Delete";
+"reader.delete.confirm.title" = "Delete Page";
+"reader.delete.confirm.message" = "This page will be permanently deleted from your offline library.";
+"reader.delete.confirm.delete" = "Delete";
+"common.cancel" = "Cancel";

@@ -19,6 +19,10 @@ final class OfflineReaderViewModel: ObservableObject {
         self.offlineReaderService = offlineReaderService
     }
 
+    func deletePage() async throws {
+        try await offlineReaderService.deletePage(pageID)
+    }
+
     func load() async {
         isLoading = true
         defer { isLoading = false }

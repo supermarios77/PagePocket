@@ -3,6 +3,8 @@ import WebKit
 
 struct OfflineReaderView: View {
     @StateObject private var viewModel: OfflineReaderViewModel
+    @Environment(\.dismiss) private var dismiss
+    @State private var showDeleteConfirmation = false
 
     init(viewModel: OfflineReaderViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel)
@@ -33,14 +35,40 @@ struct OfflineReaderView: View {
         .navigationTitle(viewModel.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if let shareURL = viewModel.shareURL {
-                ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                if let shareURL = viewModel.shareURL {
                     ShareLink(item: shareURL) {
                         Image(systemName: "square.and.arrow.up")
                     }
                     .accessibilityLabel(String(localized: "reader.toolbar.share"))
                 }
+                
+                Button(role: .destructive) {
+                    showDeleteConfirmation = true
+                } label: {
+                    Image(systemName: "trash")
+                }
+                .accessibilityLabel(String(localized: "reader.toolbar.delete"))
             }
+        }
+        .confirmationDialog(
+            String(localized: "reader.delete.confirm.title"),
+            isPresented: $showDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button(String(localized: "reader.delete.confirm.delete"), role: .destructive) {
+                Task {
+                    do {
+                        try await viewModel.deletePage()
+                        dismiss()
+                    } catch {
+                        // Error handled by notification system
+                    }
+                }
+            }
+            Button(String(localized: "common.cancel"), role: .cancel) {}
+        } message: {
+            Text(String(localized: "reader.delete.confirm.message"))
         }
         .task {
             await viewModel.load()
