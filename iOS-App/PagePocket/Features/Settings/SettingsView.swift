@@ -79,6 +79,19 @@ struct SettingsView: View {
                 }
             )
         }
+        .alert(item: Binding(
+            get: { viewModel.syncFeedback },
+            set: { viewModel.syncFeedback = $0 }
+        )) { feedback in
+            Alert(
+                title: Text(feedback.kind == .success 
+                    ? String(localized: "settings.action.sync.success")
+                    : String(localized: "settings.action.sync.failed")),
+                dismissButton: .default(Text(String(localized: "common.ok"))) {
+                    viewModel.syncFeedback = nil
+                }
+            )
+        }
     }
     
     private var premiumSection: some View {
@@ -112,8 +125,39 @@ struct SettingsView: View {
                         .clipShape(Capsule())
                 }
             }
+            
+            if viewModel.isPremium {
+                Divider()
+                
+                Button(action: {
+                    Task {
+                        await viewModel.syncNow()
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "icloud.and.arrow.up")
+                            .foregroundStyle(Color.accentColor)
+                        
+                        if viewModel.isSyncing {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                        
+                        Text(String(localized: "settings.section.premium.syncNow"))
+                            .foregroundStyle(.primary)
+                        
+                        Spacer()
+                    }
+                }
+                .disabled(viewModel.isSyncing)
+            }
         } header: {
             Text(String(localized: "settings.section.premium.title"))
+        } footer: {
+            if viewModel.isPremium {
+                Text(String(localized: "settings.section.premium.cloudSync"))
+                    .font(.caption)
+            }
         }
     }
 }
@@ -134,7 +178,7 @@ private struct ThemePicker: View {
 #Preview {
     @Previewable @State var theme = AppEnvironment.ThemePreference.system
     NavigationStack {
-        SettingsView(viewModel: SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()))
+        SettingsView(viewModel: SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService(), cloudSyncService: MockCloudSyncService()))
     }
 }
 

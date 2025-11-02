@@ -107,6 +107,8 @@
 "settings.section.premium.status.active" = "Active";
 "settings.section.premium.status.free" = "Free";
 "settings.section.premium.upgrade" = "Upgrade to Premium";
+"settings.section.premium.syncNow" = "Sync Now";
+"settings.section.premium.cloudSync" = "Cloud Sync";
 "settings.section.general.title" = "General";
 "settings.section.general.appTheme" = "App Theme";
 "settings.section.general.appTheme.system" = "System";
@@ -124,6 +126,8 @@
 "settings.action.clearCache" = "Clear Cache";
 "settings.action.clearCache.success" = "Cache cleared successfully";
 "settings.action.clearCache.failed" = "Failed to clear cache";
+"settings.action.sync.success" = "Sync completed successfully";
+"settings.action.sync.failed" = "Sync failed. Please check your iCloud settings.";
 "settings.action.cancel" = "Cancel";
 
 /* MARK: - Onboarding */

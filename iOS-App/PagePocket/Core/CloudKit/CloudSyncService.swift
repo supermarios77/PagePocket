@@ -7,7 +7,7 @@ import CloudKit
 import Foundation
 
 /// Service for syncing saved pages with iCloud using CloudKit
-protocol CloudSyncService {
+protocol CloudSyncService: Sendable {
     /// Sync all local pages with iCloud
     func syncPages() async throws
     

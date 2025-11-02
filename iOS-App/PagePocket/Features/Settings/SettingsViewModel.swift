@@ -17,8 +17,11 @@ final class SettingsViewModel: ObservableObject {
 
     var theme: Binding<AppEnvironment.ThemePreference>
     let purchaseService: PurchaseService
+    let cloudSyncService: CloudSyncService
 
     @Published private(set) var isPremium: Bool = false
+    @Published private(set) var isSyncing: Bool = false
+    @Published private(set) var syncFeedback: CacheFeedback?
     
     @Published var autoDownload: Bool {
         didSet {
@@ -42,9 +45,10 @@ final class SettingsViewModel: ObservableObject {
         URL(string: "https://github.com/supermarios77/PagePocket/issues")!
     }
 
-    init(theme: Binding<AppEnvironment.ThemePreference>, purchaseService: PurchaseService) {
+    init(theme: Binding<AppEnvironment.ThemePreference>, purchaseService: PurchaseService, cloudSyncService: CloudSyncService) {
         self.theme = theme
         self.purchaseService = purchaseService
+        self.cloudSyncService = cloudSyncService
         self.autoDownload = UserDefaults.standard.bool(forKey: "autoDownload")
         self.downloadOverWiFi = UserDefaults.standard.bool(forKey: "downloadOverWiFi")
         self.isPremium = purchaseService.currentEntitlements.isPremium
@@ -77,6 +81,21 @@ final class SettingsViewModel: ObservableObject {
             cacheFeedback = CacheFeedback(kind: .success)
         } catch {
             cacheFeedback = CacheFeedback(kind: .failure)
+        }
+    }
+    
+    func syncNow() async {
+        guard !isSyncing else { return }
+        guard isPremium else { return }
+        
+        isSyncing = true
+        defer { isSyncing = false }
+        
+        do {
+            try await cloudSyncService.syncPages()
+            syncFeedback = CacheFeedback(kind: .success)
+        } catch {
+            syncFeedback = CacheFeedback(kind: .failure)
         }
     }
 }

@@ -232,7 +232,7 @@ struct HomeView: View {
     HomeView(
         viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService(), purchaseService: MockPurchaseService()),
         selectedTab: .constant(.home),
-        makeSettingsViewModel: { SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService()) },
+        makeSettingsViewModel: { SettingsViewModel(theme: $theme, purchaseService: MockPurchaseService(), cloudSyncService: MockCloudSyncService()) },
         makePaywallViewModel: { PaywallViewModel(purchaseService: MockPurchaseService()) }
     )
 }

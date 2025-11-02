@@ -40,7 +40,7 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
-        SettingsViewModel(theme: makeThemeBinding(), purchaseService: appEnvironment.purchaseService)
+        SettingsViewModel(theme: makeThemeBinding(), purchaseService: appEnvironment.purchaseService, cloudSyncService: appEnvironment.cloudSyncService)
     }
     
     func makePaywallViewModel() -> PaywallViewModel {
