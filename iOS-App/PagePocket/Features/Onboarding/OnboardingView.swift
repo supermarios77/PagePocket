@@ -38,7 +38,7 @@ struct OnboardingView: View {
                                 currentPage += 1
                             }
                         }) {
-                            Text(String(localized: "onboarding.getStarted"))
+                            Text(String(localized: "onboarding.next"))
                                 .font(.headline)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
@@ -76,37 +76,46 @@ struct OnboardingView: View {
 private struct OnboardingPageView: View {
     let page: OnboardingViewModel.Page
     let index: Int
+    @State private var isAnimating = false
     
     var body: some View {
         VStack(spacing: 40) {
             Spacer()
             
-            // Animated icon with gradient
-            ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.accentColor.opacity(0.2),
-                                Color.accentColor.opacity(0.05)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 180, height: 180)
-                
-                Image(systemName: page.iconName)
-                    .font(.system(size: 80, weight: .medium))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+            Group {
+                if index == 1 {
+                    // Special interactive demo for "how to" page
+                    HowToDemoView(isAnimating: $isAnimating)
+                        .padding(.bottom, 20)
+                } else {
+                    // Standard icon with gradient
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    colors: [
+                                        Color.accentColor.opacity(0.2),
+                                        Color.accentColor.opacity(0.05)
+                                    ],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                            .frame(width: 180, height: 180)
+                        
+                        Image(systemName: page.iconName)
+                            .font(.system(size: 80, weight: .medium))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [Color.accentColor, Color.accentColor.opacity(0.7)],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
+                            )
+                    }
+                    .padding(.bottom, 20)
+                }
             }
-            .padding(.bottom, 20)
             
             VStack(spacing: 20) {
                 Text(page.title)
@@ -127,6 +136,55 @@ private struct OnboardingPageView: View {
         }
         .padding(.vertical, 40)
         .padding(.horizontal, 20)
+        .onAppear {
+            if index == 1 {
+                withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                    isAnimating = true
+                }
+            }
+        }
+    }
+}
+
+private struct HowToDemoView: View {
+    @Binding var isAnimating: Bool
+    
+    var body: some View {
+        VStack(spacing: 20) {
+            // Browser icon with URL
+            VStack(spacing: 12) {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.accentColor.opacity(0.1))
+                    .frame(width: 140, height: 100)
+                    .overlay(
+                        VStack(spacing: 6) {
+                            Image(systemName: "safari")
+                                .font(.system(size: 32))
+                                .foregroundStyle(Color.accentColor)
+                            Text("example.com")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    )
+                
+                // Arrow
+                Image(systemName: "arrow.down")
+                    .font(.title2)
+                    .foregroundStyle(Color.accentColor)
+                    .symbolEffect(.bounce.up, value: isAnimating)
+                
+                // Downloaded icon
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.accentColor.opacity(0.15))
+                    .frame(width: 120, height: 80)
+                    .overlay(
+                        Image(systemName: "doc.fill")
+                            .font(.system(size: 28))
+                            .foregroundStyle(Color.accentColor)
+                            .symbolEffect(.pulse, value: isAnimating)
+                    )
+            }
+        }
     }
 }
 

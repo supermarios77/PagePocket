@@ -21,14 +21,9 @@ final class OnboardingViewModel: ObservableObject {
                 description: String(localized: "onboarding.welcome.description")
             ),
             Page(
-                iconName: "wifi.slash",
-                title: String(localized: "onboarding.feature.offline.title"),
-                description: String(localized: "onboarding.feature.offline.description")
-            ),
-            Page(
-                iconName: "arrow.triangle.2.circlepath",
-                title: String(localized: "onboarding.feature.sync.title"),
-                description: String(localized: "onboarding.feature.sync.description")
+                iconName: "safari",
+                title: String(localized: "onboarding.howto.title"),
+                description: String(localized: "onboarding.howto.description")
             ),
             Page(
                 iconName: "tray.fill",

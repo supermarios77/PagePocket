@@ -124,10 +124,10 @@
 /* MARK: - Onboarding */
 "onboarding.welcome.title" = "Welcome to PagePocket";
 "onboarding.welcome.description" = "Your personal offline reading companion. Save web pages and read them anytime, anywhere.";
-"onboarding.feature.offline.title" = "Read Offline";
-"onboarding.feature.offline.description" = "Download articles to read without an internet connection.";
-"onboarding.feature.sync.title" = "Smart Sync";
-"onboarding.feature.sync.description" = "Keep your reading list organized and in sync across devices.";
-"onboarding.feature.organize.title" = "Stay Organized";
-"onboarding.feature.organize.description" = "Categorize and track your reading progress.";
+"onboarding.howto.title" = "Save Any Web Page";
+"onboarding.howto.description" = "Paste a URL in the Browse tab to instantly capture it for offline reading.";
+"onboarding.howto.example" = "Try it with any article or blog post!";
+"onboarding.feature.organize.title" = "Your Reading Hub";
+"onboarding.feature.organize.description" = "All your saved pages in one place, always accessible offline.";
 "onboarding.getStarted" = "Get Started";
+"onboarding.next" = "Next";
