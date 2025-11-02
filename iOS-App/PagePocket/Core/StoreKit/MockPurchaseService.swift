@@ -14,10 +14,11 @@ actor MockPurchaseService: PurchaseService {
     
     init(initialEntitlements: SubscriptionEntitlements? = nil) {
         // Try to load saved entitlements first, otherwise use .free
-        if let saved = loadEntitlementsSync(), let initial = initialEntitlements {
+        let saved = Self.loadEntitlementsSync()
+        if let saved = saved, let initial = initialEntitlements {
             // If both saved and initial exist, prefer initial (for testing)
             self.currentEntitlements = initial
-        } else if let saved = loadEntitlementsSync() {
+        } else if let saved = saved {
             self.currentEntitlements = saved
         } else {
             self.currentEntitlements = initialEntitlements ?? .free
@@ -158,7 +159,7 @@ actor MockPurchaseService: PurchaseService {
         return try? JSONDecoder().decode(SubscriptionEntitlements.self, from: data)
     }
     
-    private func loadEntitlementsSync() -> SubscriptionEntitlements? {
+    private static func loadEntitlementsSync() -> SubscriptionEntitlements? {
         guard let data = UserDefaults.standard.data(forKey: "mock_premium_entitlements") else {
             return nil
         }
