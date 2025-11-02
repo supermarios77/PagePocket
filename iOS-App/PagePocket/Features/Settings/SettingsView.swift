@@ -89,6 +89,7 @@ private struct ThemePicker: View {
             Text(String(localized: "settings.section.general.appTheme.light")).tag(AppEnvironment.ThemePreference.light)
             Text(String(localized: "settings.section.general.appTheme.dark")).tag(AppEnvironment.ThemePreference.dark)
         }
+        .tint(.accentColor)
     }
 }
 
