@@ -49,6 +49,14 @@ struct HomeView: View {
                             )
                         }
                         .buttonStyle(.plain)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(String(localized: "home.readingList.item.delete"), role: .destructive) {
+                                Task {
+                                    await viewModel.deletePage(item.id)
+                                }
+                            }
+                            .accessibilityLabel(String(localized: "home.readingList.item.delete"))
+                        }
 
                         if item.id != viewModel.readingList.last?.id {
                             Divider()

@@ -143,6 +143,15 @@ final class HomeViewModel: ObservableObject {
         OfflineReaderViewModel(pageID: pageID, offlineReaderService: offlineReaderService)
     }
 
+    func deletePage(_ pageID: UUID) async {
+        do {
+            try await offlineReaderService.deletePage(pageID)
+            await refreshReadingList()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func updateStatus(for pageID: UUID, status: SavedPage.Status) async {
         do {
             try await offlineReaderService.updateStatus(for: pageID, status: status)

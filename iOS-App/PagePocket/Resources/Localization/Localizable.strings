@@ -36,6 +36,7 @@
 "home.readingList.item.status.new" = "New";
 "home.readingList.item.status.progress" = "In Progress";
 "home.readingList.item.status.completed" = "Completed";
+"home.readingList.item.delete" = "Delete";
 
 "home.offlineTips.title" = "Offline mastery";
 "home.offlineTips.subtitle" = "Set up the essentials before travelling";
