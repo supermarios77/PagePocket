@@ -198,12 +198,8 @@ struct HomeView: View {
         switch action.action {
         case .navigateToBrowser:
             selectedTab = RootView.Tab.browser
-        case .navigateToCollections:
-            // Placeholder - Collections not implemented yet
-            break
-        case .navigateToSync:
-            // Placeholder - Sync not implemented yet
-            break
+        case .navigateToDownloads:
+            selectedTab = RootView.Tab.downloads
         }
     }
 }

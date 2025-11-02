@@ -92,6 +92,7 @@
 
 /* MARK: - Downloads */
 "downloads.navigation.title" = "Downloads";
+"downloads.navigation.subtitle" = "View your downloads";
 "downloads.navigation.menu" = "Open downloads actions";
 
 "downloads.active.title" = "Active downloads";

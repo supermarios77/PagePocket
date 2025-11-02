@@ -12,8 +12,7 @@ final class HomeViewModel: ObservableObject {
         
         enum ActionType {
             case navigateToBrowser
-            case navigateToCollections
-            case navigateToSync
+            case navigateToDownloads
         }
 
         static let defaults: [QuickAction] = [
@@ -24,16 +23,10 @@ final class HomeViewModel: ObservableObject {
                 action: .navigateToBrowser
             ),
             QuickAction(
-                title: String(localized: "home.quickActions.collections.title"),
-                subtitle: String(localized: "home.quickActions.collections.subtitle"),
-                systemImageName: "rectangle.3.group.bubble.left",
-                action: .navigateToCollections
-            ),
-            QuickAction(
-                title: String(localized: "home.quickActions.sync.title"),
-                subtitle: String(localized: "home.quickActions.sync.subtitle"),
-                systemImageName: "icloud.and.arrow.down",
-                action: .navigateToSync
+                title: String(localized: "downloads.navigation.title"),
+                subtitle: String(localized: "downloads.navigation.subtitle", defaultValue: "View your downloads"),
+                systemImageName: "arrow.down.circle",
+                action: .navigateToDownloads
             )
         ]
     }
