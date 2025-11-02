@@ -42,46 +42,9 @@ struct DownloadsView: View {
                 }
             }
             .listStyle(.insetGrouped)
-
-            VStack(alignment: .leading, spacing: 12) {
-                Text(String(localized: "downloads.actions.title"))
-                    .font(.headline)
-
-                VStack(spacing: 12) {
-                    Button(action: {}) {
-                        Label(String(localized: "downloads.actions.import"), systemImage: "folder.badge.plus")
-                            .labelStyle(.titleAndIcon)
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-
-                    Button(action: {}) {
-                        Label(String(localized: "downloads.actions.manage"), systemImage: "slider.horizontal.3")
-                            .labelStyle(.titleAndIcon)
-                    }
-                    .buttonStyle(.bordered)
-                    .buttonBorderShape(.capsule)
-                }
-            }
-            .padding(20)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color(.systemBackground))
-            .overlay(
-                Rectangle()
-                    .fill(Color(.separator))
-                    .frame(height: 1),
-                alignment: .top
-            )
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle(String(localized: "downloads.navigation.title"))
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {}) {
-                    Image(systemName: "ellipsis.circle")
-                }
-                .accessibilityLabel(String(localized: "downloads.navigation.menu"))
-            }
-        }
         .overlay(alignment: .top) {
             if viewModel.isLoading {
                 ProgressView()
