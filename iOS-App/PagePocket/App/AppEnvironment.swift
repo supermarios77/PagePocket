@@ -26,13 +26,15 @@ final class AppEnvironment: ObservableObject {
     let offlineReaderService: OfflineReaderService
     let downloadService: DownloadService
     let browsingExperienceService: BrowsingExperienceService
+    let purchaseService: PurchaseService
 
     init(
         networkClient: NetworkClient = URLSessionNetworkClient(),
         storageProvider: StorageProvider? = nil,
         offlineReaderService: OfflineReaderService? = nil,
         downloadService: DownloadService? = nil,
-        browsingExperienceService: BrowsingExperienceService? = nil
+        browsingExperienceService: BrowsingExperienceService? = nil,
+        purchaseService: PurchaseService? = nil
     ) {
         // Load saved theme preference
         let savedTheme = UserDefaults.standard.string(forKey: "appTheme") ?? "system"
@@ -66,6 +68,13 @@ final class AppEnvironment: ObservableObject {
 
         self.browsingExperienceService = browsingExperienceService
             ?? InMemoryBrowsingExperienceService()
+        
+        // Use MockPurchaseService for development, StoreKit2PurchaseService for production
+        #if DEBUG
+        self.purchaseService = purchaseService ?? MockPurchaseService()
+        #else
+        self.purchaseService = purchaseService ?? StoreKit2PurchaseService()
+        #endif
     }
 }
 
