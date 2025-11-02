@@ -1,5 +1,7 @@
 import Combine
 
+import SwiftUI
+
 @MainActor
 final class RootViewModel: ObservableObject {
     private let appEnvironment: AppEnvironment
@@ -10,6 +12,13 @@ final class RootViewModel: ObservableObject {
 
     init(appEnvironment: AppEnvironment) {
         self.appEnvironment = appEnvironment
+    }
+
+    func makeThemeBinding() -> Binding<AppEnvironment.ThemePreference> {
+        Binding(
+            get: { self.appEnvironment.theme },
+            set: { self.appEnvironment.theme = $0 }
+        )
     }
 
     func makeHomeViewModel() -> HomeViewModel {
@@ -31,7 +40,7 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
-        SettingsViewModel(theme: $appEnvironment.theme)
+        SettingsViewModel(theme: makeThemeBinding())
     }
 }
 
