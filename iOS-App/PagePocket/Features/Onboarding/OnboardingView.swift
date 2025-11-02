@@ -2,10 +2,12 @@ import SwiftUI
 
 struct OnboardingView: View {
     @StateObject private var viewModel: OnboardingViewModel
+    let offlineReaderService: OfflineReaderService
     @State private var currentPage = 0
     
-    init(viewModel: OnboardingViewModel) {
+    init(viewModel: OnboardingViewModel, offlineReaderService: OfflineReaderService) {
         _viewModel = StateObject(wrappedValue: viewModel)
+        self.offlineReaderService = offlineReaderService
     }
     
     var body: some View {
@@ -24,8 +26,13 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 TabView(selection: $currentPage) {
                     ForEach(Array(viewModel.pages.enumerated()), id: \.offset) { index, page in
-                        OnboardingPageView(page: page, index: index)
-                            .tag(index)
+                        if index == 1 {
+                            InteractiveTryItPageView(offlineReaderService: offlineReaderService)
+                                .tag(index)
+                        } else {
+                            OnboardingPageView(page: page, index: index)
+                                .tag(index)
+                        }
                     }
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
@@ -188,7 +195,123 @@ private struct HowToDemoView: View {
     }
 }
 
+private struct InteractiveTryItPageView: View {
+    let offlineReaderService: OfflineReaderService
+    @State private var urlText = ""
+    @State private var isSaving = false
+    @State private var showSuccess = false
+    @State private var showError = false
+    
+    var body: some View {
+        VStack(spacing: 40) {
+            Spacer()
+            
+            VStack(spacing: 20) {
+                Text(String(localized: "onboarding.howto.title"))
+                    .font(.system(size: 34, weight: .bold))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.primary)
+                
+                Text(String(localized: "onboarding.howto.description"))
+                    .font(.title3)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(3)
+                    .padding(.horizontal, 20)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
+                    Image(systemName: "link")
+                        .foregroundStyle(.secondary)
+                    
+                    TextField(String(localized: "onboarding.howto.placeholder"), text: $urlText)
+                        .textFieldStyle(.plain)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled(true)
+                        .keyboardType(.URL)
+                }
+                .padding(16)
+                .background(
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color(.secondarySystemBackground))
+                )
+                
+                Button(action: {
+                    Task {
+                        await saveURL()
+                    }
+                }) {
+                    if isSaving {
+                        ProgressView()
+                            .tint(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    } else {
+                        Text(String(localized: "onboarding.howto.action"))
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                    }
+                }
+                .background(AppTheme.primaryGradient)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color.accentColor.opacity(0.3), radius: 10, x: 0, y: 5)
+                .disabled(urlText.isEmpty || isSaving)
+            }
+            .padding(.horizontal, 20)
+            
+            Spacer()
+        }
+        .padding(.vertical, 40)
+        .alert(isPresented: $showSuccess) {
+            Alert(
+                title: Text("✓"),
+                message: Text(String(localized: "onboarding.howto.success")),
+                dismissButton: .default(Text(String(localized: "common.ok")))
+            )
+        }
+        .alert(String(localized: "onboarding.howto.error"), isPresented: $showError) {
+            Button(String(localized: "common.ok")) { showError = false }
+        }
+    }
+    
+    private func saveURL() async {
+        guard let url = normalizeURL(from: urlText) else {
+            showError = true
+            return
+        }
+        
+        isSaving = true
+        do {
+            _ = try await offlineReaderService.savePage(from: url)
+            showSuccess = true
+            urlText = ""
+        } catch {
+            showError = true
+        }
+        isSaving = false
+    }
+    
+    private func normalizeURL(from text: String) -> URL? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        
+        if let url = URL(string: trimmed), url.scheme != nil {
+            guard ["http", "https"].contains(url.scheme?.lowercased()) else {
+                return nil
+            }
+            return url
+        }
+        
+        let prefixed = "https://" + trimmed
+        return URL(string: prefixed)
+    }
+}
+
 #Preview {
-    OnboardingView(viewModel: OnboardingViewModel())
+    OnboardingView(viewModel: OnboardingViewModel(), offlineReaderService: StubOfflineReaderService())
 }
 
