@@ -1,6 +1,7 @@
 /* MARK: - Common */
 "placeholder.action.learnMore" = "Learn More";
 "common.ok" = "OK";
+"common.cancel" = "Cancel";
 
 /* MARK: - Tabs */
 "home.tab.title" = "Home";
@@ -37,6 +38,8 @@
 "home.readingList.item.status.progress" = "In Progress";
 "home.readingList.item.status.completed" = "Completed";
 "home.readingList.item.delete" = "Delete";
+"home.readingList.readTime.one" = "1 min read";
+"home.readingList.readTime.many" = "%d min read";
 
 "home.offlineTips.title" = "Offline mastery";
 "home.offlineTips.subtitle" = "Set up the essentials before travelling";
@@ -47,8 +50,6 @@
 "home.offlineTips.item3.title" = "Stay notified";
 "home.offlineTips.item3.subtitle" = "Get alerts when downloads finish";
 "home.error.title" = "Unable to Update";
-"home.readingList.readTime.one" = "1 min read";
-"home.readingList.readTime.many" = "%d min read";
 
 /* MARK: - Browser */
 "browser.navigation.title" = "Browser";
@@ -62,28 +63,6 @@
 "browser.recentSessions.title" = "Recent sessions";
 "browser.recentSessions.subtitle" = "Pick up where you left off";
 "browser.recentSessions.empty" = "Save a page to see it appear here.";
-"browser.recentSessions.item1.title" = "Offline architecture patterns";
-"browser.recentSessions.item1.subtitle" = "appleinsider.com";
-"browser.recentSessions.item2.title" = "Minimal browser UI inspirations";
-"browser.recentSessions.item2.subtitle" = "dribbble.com";
-"browser.recentSessions.item.status.synced" = "Synced";
-"browser.recentSessions.item.status.updated" = "Updated";
-
-"browser.suggestedActions.title" = "Suggested actions";
-"browser.suggestedActions.subtitle" = "Helpful tools for faster saving";
-"browser.suggestedActions.item1.title" = "Bookmark for later";
-"browser.suggestedActions.item1.subtitle" = "Add to a curated list";
-"browser.suggestedActions.item2.title" = "Resume last tab";
-"browser.suggestedActions.item2.subtitle" = "Reopen your previous session";
-"browser.suggestedActions.item3.title" = "Explore offline catalog";
-"browser.suggestedActions.item3.subtitle" = "See community favorites";
-"browser.suggestedActions.item4.title" = "Archive for travel";
-"browser.suggestedActions.item4.subtitle" = "Keep content lightweight";
-
-"browser.offlinePreview.title" = "Offline preview";
-"browser.offlinePreview.subtitle" = "See how a saved page will look";
-"browser.offlinePreview.card.title" = "Smart capture";
-"browser.offlinePreview.card.subtitle" = "We detect the best reading format automatically";
 "browser.capture.success.title" = "Page Saved";
 "browser.capture.error.title" = "Capture Failed";
 "browser.capture.success" = "Saved \"%@\" for offline reading.";
@@ -97,19 +76,11 @@
 
 "downloads.active.title" = "Active downloads";
 "downloads.active.subtitle" = "Currently processing content";
-"downloads.active.item1.title" = "Offline-first API Guidelines";
-"downloads.active.item1.subtitle" = "Reading list • 12 MB";
-"downloads.active.item2.title" = "Curated UI Inspirations";
-"downloads.active.item2.subtitle" = "Collection • 37 MB";
 "downloads.active.item.status.pending" = "Pending";
 "downloads.active.item.status.inProgress" = "Downloading";
 
 "downloads.completed.title" = "Available offline";
 "downloads.completed.subtitle" = "Saved and ready to view";
-"downloads.completed.item1.title" = "SwiftData Essentials";
-"downloads.completed.item1.subtitle" = "Guide • 9 MB";
-"downloads.completed.item2.title" = "Accessibility Checklist";
-"downloads.completed.item2.subtitle" = "Document • 5 MB";
 "downloads.completed.item.status.available" = "Available";
 "downloads.completed.item.status.archived" = "Archived";
 "downloads.completed.item.status.failed" = "Failed";
@@ -128,4 +99,24 @@
 "reader.delete.confirm.title" = "Delete Page";
 "reader.delete.confirm.message" = "This page will be permanently deleted from your offline library.";
 "reader.delete.confirm.delete" = "Delete";
-"common.cancel" = "Cancel";
+
+/* MARK: - Settings */
+"settings.navigation.title" = "Settings";
+"settings.section.general.title" = "General";
+"settings.section.general.appTheme" = "App Theme";
+"settings.section.general.appTheme.system" = "System";
+"settings.section.general.appTheme.light" = "Light";
+"settings.section.general.appTheme.dark" = "Dark";
+"settings.section.downloads.title" = "Downloads";
+"settings.section.downloads.autoDownload" = "Auto-download";
+"settings.section.downloads.downloadOverWiFi" = "Download over Wi‑Fi only";
+"settings.section.privacy.title" = "Privacy & Data";
+"settings.section.privacy.clearCache" = "Clear Cache";
+"settings.section.privacy.clearCache.description" = "Remove all cached content";
+"settings.section.about.title" = "About";
+"settings.section.about.version" = "Version";
+"settings.section.about.feedback" = "Send Feedback";
+"settings.action.clearCache" = "Clear Cache";
+"settings.action.clearCache.success" = "Cache cleared successfully";
+"settings.action.clearCache.failed" = "Failed to clear cache";
+"settings.action.cancel" = "Cancel";

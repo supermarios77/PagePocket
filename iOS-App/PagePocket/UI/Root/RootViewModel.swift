@@ -25,5 +25,9 @@ final class RootViewModel: ObservableObject {
             offlineReaderService: appEnvironment.offlineReaderService
         )
     }
+
+    func makeSettingsViewModel() -> SettingsViewModel {
+        SettingsViewModel()
+    }
 }
 

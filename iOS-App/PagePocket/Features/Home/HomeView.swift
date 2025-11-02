@@ -4,10 +4,16 @@ struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
     @Binding var selectedTab: RootView.Tab
     @State private var presentedError: String?
+    let makeSettingsViewModel: () -> SettingsViewModel
 
-    init(viewModel: HomeViewModel, selectedTab: Binding<RootView.Tab>) {
+    init(
+        viewModel: HomeViewModel,
+        selectedTab: Binding<RootView.Tab>,
+        makeSettingsViewModel: @escaping () -> SettingsViewModel
+    ) {
         _viewModel = StateObject(wrappedValue: viewModel)
         _selectedTab = selectedTab
+        self.makeSettingsViewModel = makeSettingsViewModel
     }
 
     var body: some View {
@@ -84,7 +90,9 @@ struct HomeView: View {
         .navigationTitle(String(localized: "home.navigation.title"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {}) {
+                NavigationLink {
+                    SettingsView(viewModel: makeSettingsViewModel())
+                } label: {
                     Image(systemName: "gearshape")
                 }
                 .accessibilityLabel(String(localized: "home.navigation.settings"))
@@ -172,7 +180,8 @@ struct HomeView: View {
 #Preview {
     HomeView(
         viewModel: HomeViewModel(offlineReaderService: StubOfflineReaderService()),
-        selectedTab: .constant(.home)
+        selectedTab: .constant(.home),
+        makeSettingsViewModel: { SettingsViewModel() }
     )
 }
 

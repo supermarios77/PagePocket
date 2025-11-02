@@ -20,7 +20,8 @@ struct RootView: View {
             NavigationStack {
                 HomeView(
                     viewModel: viewModel.makeHomeViewModel(),
-                    selectedTab: $selectedTab
+                    selectedTab: $selectedTab,
+                    makeSettingsViewModel: viewModel.makeSettingsViewModel
                 )
             }
             .tabItem {
