@@ -21,7 +21,7 @@ final class SettingsViewModel: ObservableObject {
 
     @Published private(set) var isPremium: Bool = false
     @Published private(set) var isSyncing: Bool = false
-    @Published private(set) var syncFeedback: CacheFeedback?
+    @Published var syncFeedback: CacheFeedback?
     
     @Published var autoDownload: Bool {
         didSet {
