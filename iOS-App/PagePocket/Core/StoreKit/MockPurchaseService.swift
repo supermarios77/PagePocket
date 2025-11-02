@@ -12,8 +12,16 @@ actor MockPurchaseService: PurchaseService {
     private var observers: [UUID: AsyncStream<SubscriptionEntitlements>.Continuation] = [:]
     private var isPremiumOverride: Bool = false // Allow manual override in testing
     
-    init(initialEntitlements: SubscriptionEntitlements = .free) {
-        self.currentEntitlements = initialEntitlements
+    init(initialEntitlements: SubscriptionEntitlements? = nil) {
+        // Try to load saved entitlements first, otherwise use .free
+        if let saved = loadEntitlementsSync(), let initial = initialEntitlements {
+            // If both saved and initial exist, prefer initial (for testing)
+            self.currentEntitlements = initial
+        } else if let saved = loadEntitlementsSync() {
+            self.currentEntitlements = saved
+        } else {
+            self.currentEntitlements = initialEntitlements ?? .free
+        }
     }
     
     func loadProducts() async throws -> [SubscriptionProduct] {
@@ -97,7 +105,7 @@ actor MockPurchaseService: PurchaseService {
     // MARK: - Mock Helpers
     
     /// Manually set premium status (for testing)
-    func setPremium(_ isPremium: Bool) {
+    func setPremium(_ isPremium: Bool) async {
         if isPremium {
             let expiration = Calendar.current.date(
                 byAdding: DateComponents(year: 1),
@@ -110,8 +118,8 @@ actor MockPurchaseService: PurchaseService {
         } else {
             currentEntitlements = .free
         }
-        Task { await notifyObservers() }
-        Task { await saveEntitlements(currentEntitlements) }
+        await notifyObservers()
+        await saveEntitlements(currentEntitlements)
     }
     
     // MARK: - Private
@@ -144,6 +152,13 @@ actor MockPurchaseService: PurchaseService {
     }
     
     private func loadEntitlements() async -> SubscriptionEntitlements? {
+        guard let data = UserDefaults.standard.data(forKey: "mock_premium_entitlements") else {
+            return nil
+        }
+        return try? JSONDecoder().decode(SubscriptionEntitlements.self, from: data)
+    }
+    
+    private func loadEntitlementsSync() -> SubscriptionEntitlements? {
         guard let data = UserDefaults.standard.data(forKey: "mock_premium_entitlements") else {
             return nil
         }
