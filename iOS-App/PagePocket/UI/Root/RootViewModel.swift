@@ -4,6 +4,10 @@ import Combine
 final class RootViewModel: ObservableObject {
     private let appEnvironment: AppEnvironment
 
+    var theme: AppEnvironment.ThemePreference {
+        appEnvironment.theme
+    }
+
     init(appEnvironment: AppEnvironment) {
         self.appEnvironment = appEnvironment
     }
@@ -27,7 +31,7 @@ final class RootViewModel: ObservableObject {
     }
 
     func makeSettingsViewModel() -> SettingsViewModel {
-        SettingsViewModel()
+        SettingsViewModel(theme: $appEnvironment.theme)
     }
 }
 

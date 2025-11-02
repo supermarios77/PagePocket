@@ -4,6 +4,18 @@ import SwiftData
 
 @MainActor
 final class AppEnvironment: ObservableObject {
+    enum ThemePreference: String, CaseIterable {
+        case system
+        case light
+        case dark
+    }
+
+    @Published var theme: ThemePreference {
+        didSet {
+            UserDefaults.standard.set(theme.rawValue, forKey: "appTheme")
+        }
+    }
+
     let modelContainer: ModelContainer
     let modelContext: ModelContext
     let networkClient: NetworkClient
@@ -19,6 +31,10 @@ final class AppEnvironment: ObservableObject {
         downloadService: DownloadService? = nil,
         browsingExperienceService: BrowsingExperienceService? = nil
     ) {
+        // Load saved theme preference
+        let savedTheme = UserDefaults.standard.string(forKey: "appTheme") ?? "system"
+        self.theme = ThemePreference(rawValue: savedTheme) ?? .system
+
         self.networkClient = networkClient
 
         // Try to create SwiftData container, but create in-memory fallback if it fails

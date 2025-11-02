@@ -16,6 +16,7 @@ struct PagePocketApp: App {
         WindowGroup {
             RootView(viewModel: RootViewModel(appEnvironment: appEnvironment))
                 .modelContainer(appEnvironment.modelContainer)
+                .environmentObject(appEnvironment)
         }
     }
 }

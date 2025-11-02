@@ -3,6 +3,7 @@ import SwiftData
 
 struct RootView: View {
     @StateObject private var viewModel: RootViewModel
+    @EnvironmentObject private var appEnvironment: AppEnvironment
     @State private var selectedTab: Tab = .home
 
     enum Tab: Int {
@@ -45,12 +46,25 @@ struct RootView: View {
             }
             .tag(Tab.downloads)
         }
+        .preferredColorScheme(themeColorScheme)
+    }
+
+    private var themeColorScheme: ColorScheme? {
+        switch appEnvironment.theme {
+        case .system:
+            return nil
+        case .light:
+            return .light
+        case .dark:
+            return .dark
+        }
     }
 }
 
 #Preview {
     RootView(viewModel: RootViewModel(appEnvironment: AppEnvironment()))
         .modelContainer(for: SavedPageEntity.self, inMemory: true)
+        .environmentObject(AppEnvironment())
 }
 
 // Extension to make Tab available to HomeView

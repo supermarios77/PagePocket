@@ -81,20 +81,21 @@ struct SettingsView: View {
 }
 
 private struct ThemePicker: View {
-    @Binding var selection: SettingsViewModel.ThemePreference
+    @Binding var selection: AppEnvironment.ThemePreference
 
     var body: some View {
         Picker(String(localized: "settings.section.general.appTheme"), selection: $selection) {
-            Text(String(localized: "settings.section.general.appTheme.system")).tag(SettingsViewModel.ThemePreference.system)
-            Text(String(localized: "settings.section.general.appTheme.light")).tag(SettingsViewModel.ThemePreference.light)
-            Text(String(localized: "settings.section.general.appTheme.dark")).tag(SettingsViewModel.ThemePreference.dark)
+            Text(String(localized: "settings.section.general.appTheme.system")).tag(AppEnvironment.ThemePreference.system)
+            Text(String(localized: "settings.section.general.appTheme.light")).tag(AppEnvironment.ThemePreference.light)
+            Text(String(localized: "settings.section.general.appTheme.dark")).tag(AppEnvironment.ThemePreference.dark)
         }
     }
 }
 
 #Preview {
+    @Previewable @State var theme = AppEnvironment.ThemePreference.system
     NavigationStack {
-        SettingsView(viewModel: SettingsViewModel())
+        SettingsView(viewModel: SettingsViewModel(theme: $theme))
     }
 }
 

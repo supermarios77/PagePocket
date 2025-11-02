@@ -13,17 +13,7 @@ final class SettingsViewModel: ObservableObject {
         let kind: Kind
     }
 
-    enum ThemePreference: String, CaseIterable {
-        case system
-        case light
-        case dark
-    }
-
-    @Published var theme: ThemePreference {
-        didSet {
-            UserDefaults.standard.set(theme.rawValue, forKey: "appTheme")
-        }
-    }
+    var theme: Binding<AppEnvironment.ThemePreference>
 
     @Published var autoDownload: Bool {
         didSet {
@@ -47,10 +37,8 @@ final class SettingsViewModel: ObservableObject {
         URL(string: "https://github.com/supermarios77/PagePocket/issues")!
     }
 
-    init() {
-        // Load saved preferences
-        let savedTheme = UserDefaults.standard.string(forKey: "appTheme") ?? "system"
-        self.theme = ThemePreference(rawValue: savedTheme) ?? .system
+    init(theme: Binding<AppEnvironment.ThemePreference>) {
+        self.theme = theme
         self.autoDownload = UserDefaults.standard.bool(forKey: "autoDownload")
         self.downloadOverWiFi = UserDefaults.standard.bool(forKey: "downloadOverWiFi")
     }
