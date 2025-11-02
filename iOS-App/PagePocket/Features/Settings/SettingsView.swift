@@ -13,43 +13,13 @@ struct SettingsView: View {
         List {
             premiumSection
             
-            Section {
-                ThemePicker(selection: viewModel.theme)
-            } header: {
-                Text(String(localized: "settings.section.general.title"))
-            }
-
-            Section {
-                Toggle(String(localized: "settings.section.downloads.autoDownload"), isOn: $viewModel.autoDownload)
-                Toggle(String(localized: "settings.section.downloads.downloadOverWiFi"), isOn: $viewModel.downloadOverWiFi)
-            } header: {
-                Text(String(localized: "settings.section.downloads.title"))
-            }
-
-            Section {
-                Button(role: .destructive, action: {
-                    showClearCacheConfirmation = true
-                }) {
-                    Label(String(localized: "settings.section.privacy.clearCache"), systemImage: "trash")
-                }
-            } header: {
-                Text(String(localized: "settings.section.privacy.title"))
-            } footer: {
-                Text(String(localized: "settings.section.privacy.clearCache.description"))
-            }
-
-            Section {
-                HStack {
-                    Text(String(localized: "settings.section.about.version"))
-                    Spacer()
-                    Text(viewModel.appVersion)
-                        .foregroundStyle(.secondary)
-                }
-
-                Link(String(localized: "settings.section.about.feedback"), destination: viewModel.feedbackURL)
-            } header: {
-                Text(String(localized: "settings.section.about.title"))
-            }
+            generalSection
+            
+            downloadsSection
+            
+            privacySection
+            
+            aboutSection
         }
         .navigationTitle(String(localized: "settings.navigation.title"))
         .confirmationDialog(
@@ -70,27 +40,13 @@ struct SettingsView: View {
             get: { viewModel.cacheFeedback },
             set: { viewModel.cacheFeedback = $0 }
         )) { feedback in
-            Alert(
-                title: Text(feedback.kind == .success 
-                    ? String(localized: "settings.action.clearCache.success")
-                    : String(localized: "settings.action.clearCache.failed")),
-                dismissButton: .default(Text(String(localized: "common.ok"))) {
-                    viewModel.cacheFeedback = nil
-                }
-            )
+            cacheAlert(for: feedback)
         }
         .alert(item: Binding(
             get: { viewModel.syncFeedback },
             set: { viewModel.syncFeedback = $0 }
         )) { feedback in
-            Alert(
-                title: Text(feedback.kind == .success 
-                    ? String(localized: "settings.action.sync.success")
-                    : String(localized: "settings.action.sync.failed")),
-                dismissButton: .default(Text(String(localized: "common.ok"))) {
-                    viewModel.syncFeedback = nil
-                }
-            )
+            syncAlert(for: feedback)
         }
     }
     
@@ -159,6 +115,74 @@ struct SettingsView: View {
                     .font(.caption)
             }
         }
+    }
+    
+    private var generalSection: some View {
+        Section {
+            ThemePicker(selection: viewModel.theme)
+        } header: {
+            Text(String(localized: "settings.section.general.title"))
+        }
+    }
+    
+    private var downloadsSection: some View {
+        Section {
+            Toggle(String(localized: "settings.section.downloads.autoDownload"), isOn: $viewModel.autoDownload)
+            Toggle(String(localized: "settings.section.downloads.downloadOverWiFi"), isOn: $viewModel.downloadOverWiFi)
+        } header: {
+            Text(String(localized: "settings.section.downloads.title"))
+        }
+    }
+    
+    private var privacySection: some View {
+        Section {
+            Button(role: .destructive, action: {
+                showClearCacheConfirmation = true
+            }) {
+                Label(String(localized: "settings.section.privacy.clearCache"), systemImage: "trash")
+            }
+        } header: {
+            Text(String(localized: "settings.section.privacy.title"))
+        } footer: {
+            Text(String(localized: "settings.section.privacy.clearCache.description"))
+        }
+    }
+    
+    private var aboutSection: some View {
+        Section {
+            HStack {
+                Text(String(localized: "settings.section.about.version"))
+                Spacer()
+                Text(viewModel.appVersion)
+                    .foregroundStyle(.secondary)
+            }
+            
+            Link(String(localized: "settings.section.about.feedback"), destination: viewModel.feedbackURL)
+        } header: {
+            Text(String(localized: "settings.section.about.title"))
+        }
+    }
+    
+    private func cacheAlert(for feedback: SettingsViewModel.CacheFeedback) -> Alert {
+        Alert(
+            title: Text(feedback.kind == .success 
+                ? String(localized: "settings.action.clearCache.success")
+                : String(localized: "settings.action.clearCache.failed")),
+            dismissButton: .default(Text(String(localized: "common.ok"))) {
+                viewModel.cacheFeedback = nil
+            }
+        )
+    }
+    
+    private func syncAlert(for feedback: SettingsViewModel.CacheFeedback) -> Alert {
+        Alert(
+            title: Text(feedback.kind == .success 
+                ? String(localized: "settings.action.sync.success")
+                : String(localized: "settings.action.sync.failed")),
+            dismissButton: .default(Text(String(localized: "common.ok"))) {
+                viewModel.syncFeedback = nil
+            }
+        )
     }
 }
 
