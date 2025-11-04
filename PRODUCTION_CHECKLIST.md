@@ -18,6 +18,9 @@
 - **NOT YET ADDED TO XCODE PROJECT** ⚠️
 
 **Action Required:**
+📖 **See detailed guide:** `CLOUDKIT_SETUP_GUIDE.md`
+
+Quick steps:
 1. Open Xcode project
 2. Select the PagePocket target
 3. Go to "Signing & Capabilities" tab
