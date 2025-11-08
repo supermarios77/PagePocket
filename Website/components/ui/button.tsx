@@ -5,17 +5,21 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const baseStyles =
-  "inline-flex items-center justify-center whitespace-nowrap rounded-full text-sm font-semibold transition-transform duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black disabled:pointer-events-none disabled:opacity-40";
+  "inline-flex items-center justify-center whitespace-nowrap rounded-full border border-transparent text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:pointer-events-none disabled:opacity-40";
 
 const variantStyles = {
   primary:
-    "bg-[#8053ff] text-white shadow-[0px_16px_50px_rgba(128,83,255,0.45)] hover:-translate-y-0.5 hover:bg-[#6f3cff]",
+    "bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-28px_rgba(72,55,255,0.65)]",
+  secondary:
+    "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--surface-muted)]",
   ghost:
-    "bg-white/10 text-white hover:bg-white/15 shadow-[0px_12px_30px_rgba(0,0,0,0.35)]",
-};
+    "border-transparent bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+} as const;
+
+type Variant = keyof typeof variantStyles;
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: keyof typeof variantStyles;
+  variant?: Variant;
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
