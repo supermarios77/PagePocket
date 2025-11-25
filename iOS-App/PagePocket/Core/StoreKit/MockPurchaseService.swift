@@ -148,19 +148,19 @@ actor MockPurchaseService: PurchaseService {
     
     private func saveEntitlements(_ entitlements: SubscriptionEntitlements) async {
         if let encoded = try? JSONEncoder().encode(entitlements) {
-            UserDefaults.standard.set(encoded, forKey: "mock_premium_entitlements")
+            UserDefaults.standard.set(encoded, forKey: AppConstants.UserDefaultsKeys.mockPremiumEntitlements)
         }
     }
     
     private func loadEntitlements() async -> SubscriptionEntitlements? {
-        guard let data = UserDefaults.standard.data(forKey: "mock_premium_entitlements") else {
+        guard let data = UserDefaults.standard.data(forKey: AppConstants.UserDefaultsKeys.mockPremiumEntitlements) else {
             return nil
         }
         return try? JSONDecoder().decode(SubscriptionEntitlements.self, from: data)
     }
     
     private static func loadEntitlementsSync() -> SubscriptionEntitlements? {
-        guard let data = UserDefaults.standard.data(forKey: "mock_premium_entitlements") else {
+        guard let data = UserDefaults.standard.data(forKey: AppConstants.UserDefaultsKeys.mockPremiumEntitlements) else {
             return nil
         }
         return try? JSONDecoder().decode(SubscriptionEntitlements.self, from: data)

@@ -15,7 +15,7 @@ final class AppEnvironment: ObservableObject {
 
     @Published var theme: ThemePreference {
         didSet {
-            UserDefaults.standard.set(theme.rawValue, forKey: "appTheme")
+            UserDefaults.standard.set(theme.rawValue, forKey: AppConstants.UserDefaultsKeys.appTheme)
         }
     }
 
@@ -39,7 +39,7 @@ final class AppEnvironment: ObservableObject {
         cloudSyncService: CloudSyncService? = nil
     ) {
         // Load saved theme preference
-        let savedTheme = UserDefaults.standard.string(forKey: "appTheme") ?? "system"
+        let savedTheme = UserDefaults.standard.string(forKey: AppConstants.UserDefaultsKeys.appTheme) ?? "system"
         self.theme = ThemePreference(rawValue: savedTheme) ?? .system
 
         self.networkClient = networkClient
@@ -50,9 +50,20 @@ final class AppEnvironment: ObservableObject {
             container = try ModelContainer(for: SavedPageEntity.self)
         } catch {
             // Log error in production, but provide fallback for development
-            Self.logger.error("SwiftData initialization failed: \(error.localizedDescription)")
-            // In production, you might want to show an error UI or use UserDefaults fallback
-            container = try! ModelContainer(for: SavedPageEntity.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+            Self.logger.error("SwiftData initialization failed: \(error.localizedDescription, privacy: .public)")
+            // In production, fallback to in-memory storage if persistent storage fails
+            // This prevents app crashes but data won't persist between launches
+            do {
+                container = try ModelContainer(
+                    for: SavedPageEntity.self,
+                    configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+                )
+                Self.logger.warning("Using in-memory storage fallback due to persistent storage failure")
+            } catch {
+                // If even in-memory fails, this is a critical error
+                Self.logger.critical("Critical: Failed to create even in-memory ModelContainer: \(error.localizedDescription, privacy: .public)")
+                fatalError("Unable to initialize data storage. This should never happen.")
+            }
         }
         self.modelContainer = container
         self.modelContext = ModelContext(container)

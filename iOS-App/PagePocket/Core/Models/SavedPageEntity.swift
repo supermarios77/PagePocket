@@ -56,7 +56,17 @@ final class SavedPageEntity {
 
 extension SavedPage {
     init(entity: SavedPageEntity) {
-        let url = URL(string: entity.urlString) ?? URL(string: "about:blank")!
+        // Safely create URL with fallback - never force unwrap
+        let url: URL
+        if let validURL = URL(string: entity.urlString) {
+            url = validURL
+        } else if let fallbackURL = URL(string: "about:blank") {
+            url = fallbackURL
+        } else {
+            // Last resort: create a file URL to prevent crash
+            url = URL(fileURLWithPath: "/")
+        }
+        
         self.init(
             id: entity.id,
             title: entity.title,

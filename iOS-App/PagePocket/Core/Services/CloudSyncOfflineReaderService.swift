@@ -4,9 +4,11 @@
 //
 
 import Foundation
+import OSLog
 
 /// Wraps OfflineReaderService to add CloudKit sync for premium users
 struct CloudSyncOfflineReaderService: OfflineReaderService {
+    private static let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "PagePocket", category: "CloudSyncOfflineReader")
     private let wrapped: OfflineReaderService
     private let purchaseService: PurchaseService
     private let cloudSyncService: CloudSyncService
@@ -64,7 +66,7 @@ struct CloudSyncOfflineReaderService: OfflineReaderService {
             } catch {
                 // Log error but don't fail the save operation
                 // User can retry sync later if needed
-                print("Failed to upload page to iCloud: \(error.localizedDescription)")
+                Self.logger.error("Failed to upload page to iCloud: \(error.localizedDescription, privacy: .public)")
             }
         }
     }

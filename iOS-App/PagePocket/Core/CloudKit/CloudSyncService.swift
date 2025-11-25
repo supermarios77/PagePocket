@@ -101,7 +101,7 @@ actor CloudKitSyncService: CloudSyncService {
     func downloadPages() async throws -> [SavedPage] {
         try await verifyAccountStatus()
         
-        let query = CKQuery(recordType: "SavedPage", predicate: NSPredicate(value: true))
+        let query = CKQuery(recordType: AppConstants.CloudKit.recordType, predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         
         do {
@@ -144,7 +144,7 @@ actor CloudKitSyncService: CloudSyncService {
         query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]
         
         do {
-            let result = try await privateDatabase.records(matching: query, inZoneWith: nil, desiredKeys: nil, resultsLimit: 100)
+            let result = try await privateDatabase.records(matching: query, inZoneWith: nil, desiredKeys: nil, resultsLimit: AppConstants.CloudKit.resultsLimit)
             return try result.matchResults.compactMap { _, recordResult -> SavedPage? in
                 switch recordResult {
                 case .success(let record):
@@ -160,7 +160,7 @@ actor CloudKitSyncService: CloudSyncService {
     
     private func createRecord(from page: SavedPage) throws -> CKRecord {
         let recordID = CKRecord.ID(recordName: page.id.uuidString)
-        let record = CKRecord(recordType: "SavedPage", recordID: recordID)
+        let record = CKRecord(recordType: AppConstants.CloudKit.recordType, recordID: recordID)
         
         record["title"] = page.title
         record["urlString"] = page.url.absoluteString
@@ -192,11 +192,22 @@ actor CloudKitSyncService: CloudSyncService {
             throw CloudSyncError.unknown(NSError(domain: "CloudSyncService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid record values"]))
         }
         
+        // Validate URL scheme for security
+        guard let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme) else {
+            throw CloudSyncError.unknown(NSError(domain: "CloudSyncService", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid URL scheme in record"]))
+        }
+        
         let htmlContent = record["htmlContent"] as? String
         let lastAccessedAt = record["lastAccessedAt"] as? Date
         
-        // Extract ID from record name
-        let id = UUID(uuidString: record.recordID.recordName) ?? UUID()
+        // Extract ID from record name - create new UUID if invalid
+        let id: UUID
+        if let parsedID = UUID(uuidString: record.recordID.recordName) {
+            id = parsedID
+        } else {
+            // Log warning but don't fail - create new ID for corrupted record
+            id = UUID()
+        }
         
         return SavedPage(
             id: id,

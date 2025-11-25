@@ -15,6 +15,9 @@ extension Notification.Name {
 enum OfflineReaderError: Error, LocalizedError {
     case contentTooLarge(size: Int, maxSize: Int)
     case freeLimitReached
+    case invalidURL
+    case emptyContent
+    case networkError(Error)
     
     var errorDescription: String? {
         switch self {
@@ -24,6 +27,12 @@ enum OfflineReaderError: Error, LocalizedError {
             return "Content too large (\(sizeMB)MB). Maximum size is \(maxMB)MB."
         case .freeLimitReached:
             return String(localized: "premium.freeLimit.message")
+        case .invalidURL:
+            return "Invalid URL. Please provide a valid http or https URL."
+        case .emptyContent:
+            return "The page returned no content. Please try a different URL."
+        case .networkError(let error):
+            return "Network error: \(error.localizedDescription)"
         }
     }
 }
@@ -46,12 +55,21 @@ struct DefaultOfflineReaderService: OfflineReaderService {
     }
 
     func savePage(from url: URL) async throws -> SavedPage {
+        // Validate URL before attempting fetch
+        guard let scheme = url.scheme?.lowercased(), ["http", "https"].contains(scheme) else {
+            throw OfflineReaderError.invalidURL
+        }
+        
         let data = try await networkClient.fetchData(from: url)
         
-        // Validate data size to prevent memory issues (50MB limit)
-        let maxSize = 50 * 1024 * 1024 // 50MB
-        guard data.count <= maxSize else {
-            throw OfflineReaderError.contentTooLarge(size: data.count, maxSize: maxSize)
+        // Validate data size to prevent memory issues
+        guard data.count <= AppConstants.Content.maxPageSizeBytes else {
+            throw OfflineReaderError.contentTooLarge(size: data.count, maxSize: AppConstants.Content.maxPageSizeBytes)
+        }
+        
+        // Validate data is not empty
+        guard !data.isEmpty else {
+            throw OfflineReaderError.emptyContent
         }
         
         let html = decodeHTML(from: data) ?? Self.placeholderHTML(for: url)
@@ -118,13 +136,46 @@ struct DefaultOfflineReaderService: OfflineReaderService {
 
     private func sanitizeHTML(_ html: String, baseURL: URL) -> String {
         var sanitized = removeScriptTags(from: html)
+        
+        // Also remove potentially dangerous tags
+        sanitized = removeDangerousTags(from: sanitized)
 
+        // Escape baseURL to prevent XSS
+        let escapedBaseURL = baseURL.absoluteString
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&#x27;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+        
         if let headRange = sanitized.range(of: "<head>", options: [.caseInsensitive]) {
-            let baseTag = "<base href=\"\(baseURL.absoluteString)\">"
+            let baseTag = "<base href=\"\(escapedBaseURL)\">"
             sanitized.replaceSubrange(headRange, with: "<head>\n\(baseTag)")
         }
 
         return sanitized
+    }
+    
+    private func removeDangerousTags(from html: String) -> String {
+        var cleaned = html
+        // Remove iframe, object, embed, form tags that could be security risks
+        let dangerousPatterns = [
+            "<iframe[\\s\\S]*?</iframe>",
+            "<object[\\s\\S]*?</object>",
+            "<embed[\\s\\S]*?>",
+            "<form[\\s\\S]*?</form>",
+            "<input[\\s\\S]*?>",
+            "<meta[^>]*http-equiv[^>]*>"
+        ]
+        
+        for pattern in dangerousPatterns {
+            cleaned = cleaned.replacingOccurrences(
+                of: pattern,
+                with: "",
+                options: [.regularExpression, .caseInsensitive]
+            )
+        }
+        
+        return cleaned
     }
 
     private func removeScriptTags(from html: String) -> String {

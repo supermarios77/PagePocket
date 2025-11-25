@@ -25,13 +25,13 @@ final class SettingsViewModel: ObservableObject {
     
     @Published var autoDownload: Bool {
         didSet {
-            UserDefaults.standard.set(autoDownload, forKey: "autoDownload")
+            UserDefaults.standard.set(autoDownload, forKey: AppConstants.UserDefaultsKeys.autoDownload)
         }
     }
 
     @Published var downloadOverWiFi: Bool {
         didSet {
-            UserDefaults.standard.set(downloadOverWiFi, forKey: "downloadOverWiFi")
+            UserDefaults.standard.set(downloadOverWiFi, forKey: AppConstants.UserDefaultsKeys.downloadOverWiFi)
         }
     }
 
@@ -42,15 +42,16 @@ final class SettingsViewModel: ObservableObject {
     }
 
     var feedbackURL: URL {
-        URL(string: "https://github.com/supermarios77/PagePocket/issues")!
+        // Safe URL creation - this URL is known to be valid, but handle gracefully
+        URL(string: "https://github.com/supermarios77/PagePocket/issues") ?? URL(string: "https://github.com")!
     }
 
     init(theme: Binding<AppEnvironment.ThemePreference>, purchaseService: PurchaseService, cloudSyncService: CloudSyncService) {
         self.theme = theme
         self.purchaseService = purchaseService
         self.cloudSyncService = cloudSyncService
-        self.autoDownload = UserDefaults.standard.bool(forKey: "autoDownload")
-        self.downloadOverWiFi = UserDefaults.standard.bool(forKey: "downloadOverWiFi")
+        self.autoDownload = UserDefaults.standard.bool(forKey: AppConstants.UserDefaultsKeys.autoDownload)
+        self.downloadOverWiFi = UserDefaults.standard.bool(forKey: AppConstants.UserDefaultsKeys.downloadOverWiFi)
         self.isPremium = purchaseService.currentEntitlements.isPremium
         
         // Subscribe to entitlement updates
