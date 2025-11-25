@@ -138,7 +138,7 @@ actor CloudKitSyncService: CloudSyncService {
         // Simplify: just get all records for now
         // Can optimize with change tokens later if needed
         let query = CKQuery(
-            recordType: "SavedPage",
+            recordType: AppConstants.CloudKit.recordType,
             predicate: NSPredicate(value: true) // Get all records
         )
         query.sortDescriptors = [NSSortDescriptor(key: "modificationDate", ascending: false)]

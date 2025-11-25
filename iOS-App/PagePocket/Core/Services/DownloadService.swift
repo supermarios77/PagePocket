@@ -15,6 +15,9 @@ actor DefaultDownloadService: DownloadService {
     private var completedDownloads: [UUID: DownloadRecord]
     private var tasks: [UUID: Task<SavedPage, Error>]
     private var observers: [UUID: AsyncStream<Void>.Continuation]
+    
+    // Limit concurrent downloads to prevent resource exhaustion
+    private static let maxConcurrentDownloads = AppConstants.Downloads.maxConcurrentDownloads
 
     init(
         offlineReaderService: OfflineReaderService,
@@ -48,6 +51,12 @@ actor DefaultDownloadService: DownloadService {
 
     @discardableResult
     func enqueueCapture(from url: URL) async throws -> SavedPage {
+        // Wait if we're at the concurrent download limit
+        while tasks.count >= Self.maxConcurrentDownloads {
+            // Wait a bit before checking again
+            try? await Task.sleep(for: .milliseconds(100))
+        }
+        
         let downloadID = UUID()
         let createdAt = Date()
         let title = url.host?.replacingOccurrences(of: "www.", with: "").capitalized ?? url.absoluteString

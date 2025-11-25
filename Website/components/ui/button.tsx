@@ -10,9 +10,9 @@ const baseStyles =
 const variantStyles = {
   primary:
     "bg-[var(--accent)] text-[var(--accent-contrast)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:shadow-[0_22px_60px_-28px_rgba(72,55,255,0.65)]",
-  secondary:
+        secondary:
     "border-[var(--border)] bg-[var(--surface)] text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--surface-muted)]",
-  ghost:
+        ghost:
     "border-transparent bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
 } as const;
 
@@ -24,13 +24,13 @@ export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant = "primary", type = "button", ...props }, ref) => {
-    return (
+  return (
       <button
         ref={ref}
         type={type}
         className={cn(baseStyles, variantStyles[variant], className)}
-        {...props}
-      />
+      {...props}
+    />
     );
   },
 );

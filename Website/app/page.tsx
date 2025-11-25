@@ -51,7 +51,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-soft)]">
               <FileText className="h-5 w-5" strokeWidth={1.8} />
-            </div>
+              </div>
             <div className="flex flex-col">
               <span className="text-sm uppercase tracking-[0.35em] text-[var(--muted)]">
                 PagePocket
@@ -69,37 +69,37 @@ export default function Home() {
             <div className="space-y-6">
               <h1 className="max-w-xl text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl md:text-6xl">
                 Save a page once.
-                <br />
+            <br />
                 Read it wherever life takes you.
-              </h1>
+          </h1>
               <p className="max-w-xl text-lg text-[var(--muted)]">
                 PagePocket turns any link into a clean, offline-perfect experience. No loading spinners, no cookie popups—just your focused reading list, ready whenever you are.
               </p>
             </div>
 
-            <form
+          <form
               className="flex w-full max-w-xl flex-col gap-3 rounded-[28px] border border-[var(--border)] bg-[var(--surface)]/90 p-4 shadow-[var(--shadow-soft)] backdrop-blur-sm sm:flex-row sm:items-center"
-              action="#"
-              method="post"
-              noValidate
-            >
-              <label className="sr-only" htmlFor="email">
-                Email address
-              </label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
+            action="#"
+            method="post"
+            noValidate
+          >
+            <label className="sr-only" htmlFor="email">
+              Email address
+            </label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
                 placeholder="you@example.com"
-                autoComplete="email"
-                required
+              autoComplete="email"
+              required
                 className="h-12 flex-1"
-              />
+            />
               <Button type="submit" className="h-12 gap-2 px-6">
                 <Send className="h-4 w-4" strokeWidth={1.8} />
                 Join waitlist
-              </Button>
-            </form>
+            </Button>
+          </form>
 
             <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--muted)]">
               <div className="flex items-center gap-2">
@@ -111,7 +111,7 @@ export default function Home() {
                 <span>Private beta invite ships this month</span>
               </div>
             </div>
-          </div>
+        </div>
 
           <div className="flex justify-center lg:justify-end">
             <div className="relative aspect-[9/19] w-[260px] sm:w-[320px]">

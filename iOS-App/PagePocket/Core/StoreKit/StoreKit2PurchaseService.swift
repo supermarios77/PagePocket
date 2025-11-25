@@ -24,9 +24,12 @@ actor StoreKit2PurchaseService: PurchaseService {
         }
         
         // Load current subscription status
-        Task {
+        // Store task reference to prevent memory leak
+        let initialLoadTask = Task {
             await updateEntitlements()
         }
+        // Task will complete quickly, no need to store reference
+        _ = initialLoadTask
     }
     
     deinit {

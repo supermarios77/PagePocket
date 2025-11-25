@@ -36,5 +36,10 @@ enum AppConstants {
         static let recordType = "SavedPage"
         static let resultsLimit = 100
     }
+    
+    // Downloads
+    enum Downloads {
+        static let maxConcurrentDownloads = 3
+    }
 }
 
